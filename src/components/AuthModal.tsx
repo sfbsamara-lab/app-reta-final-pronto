@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Lock, Mail, ArrowRight, Loader2, AlertCircle, KeyRound, HelpCircle } from 'lucide-react';
 import { Button } from './Button';
-import { loginUser, registerWithCodeAndUserPass, resetPassword, createAccessCode } from '../firebase'; 
+import { loginUser, registerWithCodeAndUserPass, resetPassword } from '../firebase'; 
 
 interface AuthModalProps {
   onClose: () => void;
