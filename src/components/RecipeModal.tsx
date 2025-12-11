@@ -54,7 +54,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ onClose, dailyTea }) =
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
       <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl relative shadow-2xl flex flex-col max-h-[90vh]">
         
         {/* Header Fixo */}

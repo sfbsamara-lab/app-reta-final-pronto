@@ -5,6 +5,14 @@
 @layer base {
   body {
     @apply bg-slate-950 text-slate-200 font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* iOS Safari fix para modais */
+  input, textarea, select {
+    font-size: 16px;
+    -webkit-user-select: text;
   }
 }
 
@@ -21,4 +29,18 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #475569; 
+}
+
+/* Otimizações para iOS */
+@supports (-webkit-appearance: none) {
+  /* Disable zoom on input focus for iOS */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Melhor performance de backdrop filter em iOS */
+  [style*="backdrop-blur"] {
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+  }
 }

@@ -69,8 +69,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-2xl p-0 relative shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
+      <div className="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-2xl p-0 relative shadow-2xl overflow-y-auto max-h-[90vh]" style={{ WebkitBackfaceVisibility: 'hidden', WebkitPerspective: '1000' }}>
         
         <button onClick={onClose} className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors z-10 p-2">
           <X className="w-5 h-5" />

@@ -10,8 +10,8 @@ interface UpgradeModalProps {
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onRedeemClick }) => {
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-slate-900 border border-yellow-500/50 w-full max-w-md rounded-2xl p-0 relative shadow-[0_0_50px_rgba(234,179,8,0.2)] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
+      <div className="bg-slate-900 border border-yellow-500/50 w-full max-w-md rounded-2xl p-0 relative shadow-[0_0_50px_rgba(234,179,8,0.2)] overflow-hidden flex flex-col max-h-[90vh] overflow-y-auto" style={{ WebkitBackfaceVisibility: 'hidden', WebkitPerspective: '1000' }}>
         
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-yellow-500/20 rounded-full blur-[80px] pointer-events-none" />
 

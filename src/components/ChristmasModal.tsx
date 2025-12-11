@@ -16,7 +16,7 @@ export const ChristmasModal: React.FC<ChristmasModalProps> = ({ onClose }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
       <div className="bg-red-950/30 border border-red-500/30 w-full max-w-lg rounded-2xl relative shadow-[0_0_50px_rgba(220,38,38,0.15)] flex flex-col max-h-[90vh]">
         
         {/* Header Festivo */}

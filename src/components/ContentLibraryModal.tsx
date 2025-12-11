@@ -17,7 +17,7 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
   const [activeTab, setActiveTab] = useState<'teas' | 'recipes' | 'cardio'>('teas');
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
       <div className="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-2xl flex flex-col max-h-[85vh] relative shadow-2xl overflow-hidden">
         
         {/* Header */}

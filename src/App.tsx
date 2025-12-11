@@ -442,7 +442,7 @@ export default function App() {
       {/* --- VIEW: DASHBOARD --- */}
       {view === 'dashboard' && user && (
         <div className="min-h-screen bg-slate-950 text-slate-200 pb-32 relative">
-          {!user.hasSeenTutorial && <TutorialModal onClose={async () => { await completeTutorial(user.uid); }} />}
+          {!user.hasSeenTutorial && <TutorialModal onClose={async () => { await new Promise(resolve => setTimeout(resolve, 100)); await completeTutorial(user.uid); }} />}
 
           {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} onRedeemClick={startUpgradeFlow} />}
           {showWorkoutModal && (

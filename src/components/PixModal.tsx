@@ -49,7 +49,7 @@ export const PixModal: React.FC<PixModalProps> = ({ onClose, itemTitle, price}) 
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
       <div className="bg-white text-slate-900 w-full max-w-sm rounded-2xl p-6 relative shadow-2xl">
         
         <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">

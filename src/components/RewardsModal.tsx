@@ -42,7 +42,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ streak, onClose }) =
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
       <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl flex flex-col max-h-[85vh] relative shadow-2xl">
         
         {/* Header */}

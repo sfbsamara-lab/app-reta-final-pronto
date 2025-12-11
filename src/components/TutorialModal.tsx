@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Shield, Flame, Lock, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from './Button';
 
@@ -7,12 +7,21 @@ interface TutorialModalProps {
 }
 
 export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = useCallback(async () => {
+    setIsClosing(true);
+    // Pequeno delay para evitar problemas de renderização simultânea em iOS
+    await new Promise(resolve => setTimeout(resolve, 50));
+    onClose();
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-sm animate-in fade-in duration-500">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
+      <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col" style={{ WebkitBackfaceVisibility: 'hidden', WebkitPerspective: '1000' }}>
         
         {/* Header Militar */}
-        <div className="text-center mb-6 border-b border-slate-800 pb-4">
+        <div className="text-center mb-6 border-b border-slate-800 pb-4 flex-shrink-0">
           <div className="inline-block p-3 bg-slate-800 rounded-full mb-3 border border-slate-700">
             <Shield className="w-8 h-8 text-slate-200" />
           </div>
@@ -25,7 +34,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
         </div>
 
         {/* Lista de Instruções */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-4 mb-8 flex-grow">
           
           <div className="flex items-start gap-4">
             <div className="p-2 bg-orange-900/20 rounded border border-orange-500/20 text-orange-500 shrink-0">
@@ -77,9 +86,11 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
 
         </div>
 
-        <Button fullWidth onClick={onClose}>
-          ENTENDIDO, INICIAR MISSÃO
-        </Button>
+        <div className="flex-shrink-0 mt-4">
+          <Button fullWidth onClick={handleClose}>
+            ENTENDIDO, INICIAR MISSÃO
+          </Button>
+        </div>
 
       </div>
     </div>

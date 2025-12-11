@@ -214,7 +214,7 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({ onClose, onComplete,
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/90 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
       <div className="bg-slate-900 border border-slate-700 w-full max-w-lg sm:rounded-2xl rounded-t-3xl relative shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh]">
         
         {/* CABEÇALHO */}
