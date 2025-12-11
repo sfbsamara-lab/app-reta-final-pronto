@@ -17,4 +17,14 @@ export interface UserState {
   hasSeenTutorial: boolean;
   hasChristmasAddon: boolean;
   requiresNewPassword?: boolean;
+  waterGoal?: number; // Nova meta de água personalizada
+  fastingGoal?: number; // Nova meta de jejum personalizada (em horas)
+}
+
+export interface DailyProgress {
+  date: string; // YYYY-MM-DD
+  water: number;
+  fasting: boolean;
+  workout: boolean;
+  timestamp: any; // serverTimestamp
 }

@@ -47,6 +47,17 @@ interface UserData {
   hasChristmasAddon: boolean;
   requiresNewPassword?: boolean;
   createdAt: any;
+  dailyRecords?: { [date: string]: string };
+  waterGoal?: number;
+  fastingGoal?: number;
+}
+
+export interface DailyProgress {
+  date: string;
+  water: number;
+  fasting: boolean;
+  workout: boolean;
+  timestamp: any;
 }
 
 // --- AUTH FUNCTIONS ---
@@ -177,7 +188,9 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
       hasSeenTutorial: false,
       hasChristmasAddon: codeData.type === 'addon' || codeData.value === 'christmas',
       requiresNewPassword: false,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
+      waterGoal: 3000, // Meta de água padrão para novos usuários
+      fastingGoal: 16 // Meta de jejum padrão para novos usuários (em horas)
     };
 
     await setDoc(userDocRef, newUserData);
@@ -236,7 +249,7 @@ export const subscribeToUserData = (uid: string, callback: (data: any) => void) 
   return onSnapshot(userRef, 
     (docSnap) => {
       if (docSnap.exists()) {
-        callback(docSnap.data());
+        callback({ ...docSnap.data(), waterGoal: docSnap.data()?.waterGoal || null });
       } else {
         callback(null);
       }
@@ -309,6 +322,93 @@ export const redeemCode = async (uid: string, codeInput: string) => {
     return { success: false, message: "Erro ao processar código." };
   }
 };
+
+// --- FUNÇÕES DE PROGRESSO DIÁRIO ---
+
+export const saveDailyProgress = async (uid: string, water: number, fasting: boolean, workout: boolean) => {
+  try {
+    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const dailyProgressRef = doc(db, "users", uid, "dailyProgress", today);
+
+    const data: DailyProgress = {
+      date: today,
+      water: water,
+      fasting: fasting,
+      workout: workout,
+      timestamp: serverTimestamp()
+    };
+    await setDoc(dailyProgressRef, data, { merge: true });
+
+    // Atualiza o documento do usuário para registrar o ID do documento de progresso diário
+    const userRef = doc(db, "users", uid);
+    await setDoc(userRef, {
+      [`dailyRecords.${today}`]: today // Salva o ID do documento na subcoleção dailyProgress
+    }, { merge: true });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao salvar progresso diário:", error);
+    return { success: false, error: (error as Error).message };
+  }
+};
+
+export const getDailyProgress = async (uid: string, date: string) => {
+  try {
+    const dailyProgressRef = doc(db, "users", uid, "dailyProgress", date);
+    const docSnap = await getDoc(dailyProgressRef);
+
+    if (docSnap.exists()) {
+      return { success: true, data: docSnap.data() as DailyProgress };
+    } else {
+      return { success: false, data: null, message: "Progresso diário não encontrado para esta data." };
+    }
+  } catch (error) {
+    console.error("Erro ao obter progresso diário:", error);
+    return { success: false, data: null, error: (error as Error).message };
+  }
+};
+
+export const getAllDailyProgress = async (uid: string) => {
+  try {
+    const dailyProgressCollectionRef = collection(db, "users", uid, "dailyProgress");
+    const q = query(dailyProgressCollectionRef);
+    const querySnapshot = await getDocs(q);
+
+    const progress: DailyProgress[] = [];
+    querySnapshot.forEach((doc) => {
+      progress.push(doc.data() as DailyProgress);
+    });
+
+    return { success: true, data: progress };
+  } catch (error) {
+    console.error("Erro ao obter todos os progressos diários:", error);
+    return { success: false, data: null, error: (error as Error).message };
+  }
+};
+
+// --- FUNÇÃO PARA ATUALIZAR A META DE ÁGUA DO USUÁRIO ---
+export const updateUserWaterGoal = async (uid: string, newGoal: number) => {
+  try {
+    const userRef = doc(db, "users", uid);
+    await setDoc(userRef, { waterGoal: newGoal }, { merge: true });
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao atualizar meta de água do usuário:", error);
+    return { success: false, error: (error as Error).message };
+  }
+};
+
+export const updateUserFastingGoal = async (uid: string, newGoal: number) => {
+  try {
+    const userRef = doc(db, "users", uid);
+    await setDoc(userRef, { fastingGoal: newGoal }, { merge: true });
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao atualizar meta de jejum do usuário:", error);
+    return { success: false, error: (error as Error).message };
+  }
+};
+
 
 // --- PAGAMENTO PIX (MOCK) ---
 // Adicionado "_" para evitar erro de variável não usada no build

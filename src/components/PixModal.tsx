@@ -7,10 +7,9 @@ interface PixModalProps {
   onClose: () => void;
   itemTitle: string;
   price: string;
-  userId?: string;
 }
 
-export const PixModal: React.FC<PixModalProps> = ({ onClose, itemTitle, price, userId }) => {
+export const PixModal: React.FC<PixModalProps> = ({ onClose, itemTitle, price}) => {
   const [step, setStep] = useState<'loading' | 'display' | 'verifying'>('loading');
   const [pixCode, setPixCode] = useState('');
   const [copied, setCopied] = useState(false);

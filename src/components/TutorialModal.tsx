@@ -46,7 +46,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <div>
               <h3 className="text-white font-bold text-sm uppercase">Metas Diárias</h3>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Água, Jejum e Treino. Complete a barra de progresso antes da meia-noite para evoluir.
+                Água, Jejum e Treino. Complete a barra de progresso antes da meia-noite para evoluir. Agora você pode <strong className="text-blue-400">definir suas metas de hidratação e jejum</strong> para personalizar ainda mais seu plano.
               </p>
             </div>
           </div>
@@ -58,7 +58,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <div>
               <h3 className="text-white font-bold text-sm uppercase">Cadeados (Premium)</h3>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Arsenal de elite (Receitas e Áudios). Disponível apenas para quem ativar o <strong className="text-yellow-500">Modo General</strong>.
+                Recursos avançados como o Arsenal de elite (Receitas e Áudios) e a <strong className="text-yellow-400">Biblioteca de Conteúdos</strong> estão disponíveis. Além disso, botões <strong className="text-yellow-400">"Ver Execução"</strong> em alguns treinos e no SOS levam a vídeos explicativos. Desbloqueie tudo ativando o <strong className="text-yellow-500">Modo General</strong>.
               </p>
             </div>
           </div>

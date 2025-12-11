@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, ArrowRight, Loader2, AlertCircle, KeyRound, HelpCircle, Bug } from 'lucide-react';
+import { X, Lock, Mail, ArrowRight, Loader2, AlertCircle, KeyRound, HelpCircle } from 'lucide-react';
 import { Button } from './Button';
-import { loginUser, registerWithCodeAndUserPass, resetPassword, createAccessCode } from '../firebase'; 
+import { loginUser, registerWithCodeAndUserPass, resetPassword } from '../firebase'; 
 
 interface AuthModalProps {
   onClose: () => void;
@@ -18,17 +18,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // DEBUG ONLY: Função para criar código rápido e testar
-  const handleCreateTestCode = async () => {
-    try {
-      const code = `TEST-${Math.floor(Math.random()*1000)}`;
-      await createAccessCode(code, 'plan', 'basic', 1);
-      alert(`Código criado: ${code}\nUse-o para registrar!`);
-      setAccessCode(code);
-    } catch (e) {
-      alert("Erro ao criar código de teste. Verifique o console.");
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,10 +153,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
               <div className="space-y-1 animate-in slide-in-from-top-2">
                 <div className="flex justify-between items-center">
                   <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Código de Acesso</label>
-                  {/* Botão Secreto de Debug para testar */}
-                  <button type="button" onClick={handleCreateTestCode} className="text-[10px] text-slate-700 hover:text-white flex items-center gap-1 opacity-50 hover:opacity-100">
-                    <Bug className="w-3 h-3"/> Testar
-                  </button>
                 </div>
                 <div className="relative">
                   <KeyRound className="absolute left-3 top-3 w-5 h-5 text-emerald-500" />

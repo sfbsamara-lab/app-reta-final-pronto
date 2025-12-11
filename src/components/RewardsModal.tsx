@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Lock, Trophy, ChevronDown, ChevronUp, Gift, Flame, ShieldCheck } from 'lucide-react';
+import { X, Lock, Trophy, ChevronDown, ChevronUp, Gift } from 'lucide-react';
 import { Button } from './Button';
 
 interface RewardsModalProps {

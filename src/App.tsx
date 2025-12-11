@@ -4,10 +4,9 @@ import {
   ChefHat, Zap, ArrowRight, Gift, UserCircle, LogOut, Timer,
   PartyPopper, Coffee, CalendarDays, MessageSquareQuote,
   HeartPulse, ShieldAlert, Trophy 
-  // Removidos Bot, Radiation
 } from 'lucide-react';
 
-import { ViewState, Tasks, UserState, UserPlan } from './types';
+import { ViewState, Tasks, UserState, UserPlan, DailyProgress } from './types';
 import { Button } from './components/Button';
 import { Card } from './components/Card';
 import { LockedFeature } from './components/LockedFeature';
@@ -19,10 +18,12 @@ import { ChristmasModal } from './components/ChristmasModal';
 import { AuthModal } from './components/AuthModal';
 import { SetPasswordModal } from './components/SetPasswordModal';
 import { PixModal } from './components/PixModal';
-import { AdminGenerator } from './components/AdminGenerator';
 import { RewardsModal } from './components/RewardsModal';
-// Removidos GeneralChat e SabotageScanner
-import { auth, subscribeToUserData, logoutUser, completeTutorial } from './firebase';
+import { Notification } from './components/Notification';
+import { ContentLibraryModal } from './components/ContentLibraryModal';
+import { SetGoalsModal } from './components/SetGoalsModal';
+import { SetFastingGoalModal } from './components/SetFastingGoalModal';
+import { auth, subscribeToUserData, logoutUser, completeTutorial, saveDailyProgress, getAllDailyProgress, updateUserWaterGoal, updateUserFastingGoal } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 // --- DADOS ESTÁTICOS ---
@@ -31,7 +32,9 @@ const DETOX_TEAS = [
   { name: "Hibisco com Gengibre", desc: "Acelerador metabólico.", recipe: "500ml água, hibisco, gengibre." },
   { name: "Cavalinha com Limão", desc: "Adeus retenção.", recipe: "500ml água, cavalinha, limão." },
   { name: "Chá Verde Turbo", desc: "Queima gordura.", recipe: "Chá verde + canela." },
-  { name: "Dente de Leão", desc: "Detox hepático.", recipe: "500ml água, dente de leão." }
+  { name: "Dente de Leão", desc: "Detox hepático.", recipe: "500ml água, dente de leão." },
+  { name: "Matcha Revitalizante", desc: "Energia e foco.", recipe: "200ml água quente, 1 colher chá matcha." },
+  { name: "Chá de Gengibre e Limão", desc: "Imunidade e digestão.", recipe: "500ml água, rodelas de gengibre, suco de 1 limão." }
 ];
 
 const SOS_RECIPES = [
@@ -52,6 +55,18 @@ const SOS_RECIPES = [
     ingredients: ["1 folha de couve", "1 maçã verde", "1 pedaço de gengibre", "200ml de água de coco", "Hortelã a gosto"],
     prep: "Bata tudo no liquidificador com gelo. Não coe para manter as fibras.",
     benefits: "Limpeza hepática e reposição de minerais essenciais."
+  },
+  {
+    name: "Omelete Proteico",
+    ingredients: ["2 ovos", "50g espinafre", "30g queijo cottage", "Sal e pimenta a gosto"],
+    prep: "Bata os ovos, misture com espinafre e queijo. Cozinhe em frigideira antiaderente.",
+    benefits: "Rico em proteínas, sustenta e ajuda na recuperação muscular."
+  },
+  {
+    name: "Salada de Quinoa e Legumes",
+    ingredients: ["100g quinoa cozida", "Tomate cereja", "Pepino", "Cebola roxa", "Azeite, limão, sal"],
+    prep: "Misture todos os ingredientes. Tempere com azeite, limão e sal.",
+    benefits: "Fonte de fibras e proteínas vegetais, ideal para saciedade e digestão."
   }
 ];
 
@@ -61,14 +76,32 @@ const SOS_CARDIO = [
     duration: "30 a 45 minutos",
     intensity: "Leve/Moderada",
     desc: "Mantenha um passo firme onde você consiga falar, mas sinta que falta um pouco de ar.",
-    steps: ["Beba 500ml de água antes.", "Não consuma nada calórico.", "Se sentir tontura, pare imediatamente."]
+    steps: ["Beba 500ml de água antes.", "Não consuma nada calórico.", "Se sentir tontura, pare imediatamente."],
+    youtubeLink: "" // Removido o link conforme solicitado
   },
   {
     title: "HIIT Queima-Glicogênio",
-    duration: "20 minutos",
+    duration: "15 minutos",
     intensity: "Altíssima",
     desc: "O objetivo é esvaziar os estoques de açúcar do sangue rapidamente.",
-    steps: ["3 min aquecimento leve.", "30 segundos correndo no MÁXIMO.", "30 segundos andando bem devagar.", "Repita 15 vezes."]
+    steps: ["3 min aquecimento leve.", "30 segundos correndo no MÁXIMO.", "30 segundos andando bem devagar.", "Repita 15 vezes."],
+    youtubeLink: "https://www.youtube.com/watch?v=D8nuuuUQUT0"
+  },
+  {
+    title: "Alongamento Dinâmico",
+    duration: "10 minutos",
+    intensity: "Leve",
+    desc: "Melhora a flexibilidade e prepara o corpo para o movimento.",
+    steps: ["Comece com rotações de braço.", "Continue com alongamentos de perna e tronco.", "Respire profundamente em cada movimento."],
+    youtubeLink: "https://www.youtube.com/watch?v=oa6qBacNZPE"
+  },
+  {
+    title: "Yoga para Iniciantes",
+    duration: "20 minutos",
+    intensity: "Leve/Moderada",
+    desc: "Fortalece o corpo e acalma a mente.",
+    steps: ["Comece com posturas básicas como Tadasana.", "Prossiga para Vrikshasana (Postura da Árvore) e Adho Mukha Svanasana (Cachorro Olhando Para Baixo).", "Finalize com Savasana (Postura do Cadáver) para relaxamento."],
+    youtubeLink: "https://www.youtube.com/watch?v=v7AYKMP6rOE" // Yoga para iniciantes (alternativo)
   }
 ];
 
@@ -121,11 +154,13 @@ export default function App() {
   const [showChristmasModal, setShowChristmasModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showRewardsModal, setShowRewardsModal] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
   const [showPixModal, setShowPixModal] = useState<{show: boolean, title: string, price: string}>({show: false, title: '', price: ''});
-
   const [showCelebration, setShowCelebration] = useState(false);
-  const [secretClicks, setSecretClicks] = useState(0);
+  const [dailyProgressHistory, setDailyProgressHistory] = useState<DailyProgress[]>([]);
+  const [notification, setNotification] = useState<{ message: string; type?: 'success' | 'error' | 'info' | 'warning' } | null>(null);
+  const [showContentLibraryModal, setShowContentLibraryModal] = useState(false);
+  const [showSetGoalsModal, setShowSetGoalsModal] = useState(false);
+  const [showSetFastingGoalsModal, setShowSetFastingGoalsModal] = useState(false);
   // Removidos showGeneralChatModal e showSabotageScannerModal
 
   // --- EFEITOS ---
@@ -186,11 +221,26 @@ export default function App() {
     if (user) {
       const today = new Date().toISOString().split('T')[0];
       localStorage.setItem(`tasks_${user.uid}_${today}`, JSON.stringify(tasks));
+      saveDailyProgress(user.uid, tasks.water, tasks.fasting, tasks.workout);
     }
   }, [tasks, user]);
 
+  // Load Daily Progress History
+  useEffect(() => {
+    if (user) {
+      const fetchHistory = async () => {
+        const result = await getAllDailyProgress(user.uid);
+        if (result.success && result.data) {
+          setDailyProgressHistory(result.data);
+          console.log("Histórico de Progresso Diário: ", result.data);
+        }
+      };
+      fetchHistory();
+    }
+  }, [user]);
+
   // Progress logic
-  const waterGoal = 3000;
+  const waterGoal = user?.waterGoal || 3000;
   const progress = useMemo(() => {
       return Math.round(((tasks.water / waterGoal) * 0.33 + (tasks.fasting ? 0.33 : 0) + (tasks.workout ? 0.33 : 0)) * 100);
   }, [tasks, waterGoal]);
@@ -201,6 +251,16 @@ export default function App() {
       setTimeout(() => setShowCelebration(false), 5000);
     }
   }, [progress, showCelebration]);
+
+  // Notificação de Hidratação (Exemplo)
+  useEffect(() => {
+    if (user && tasks.water < waterGoal && new Date().getHours() >= 18) {
+      const timer = setTimeout(() => {
+        setNotification({ message: 'Lembre-se de beber mais água para atingir sua meta!', type: 'info' });
+      }, 30000); // Tenta notificar após 30 segundos se a condição for verdadeira
+      return () => clearTimeout(timer);
+    }
+  }, [user, tasks.water, waterGoal]);
 
   // --- LÓGICA DE NEGÓCIO ---
 
@@ -231,14 +291,6 @@ export default function App() {
     });
   };
 
-  const handleAdminClick = () => {
-    const newCount = secretClicks + 1;
-    setSecretClicks(newCount);
-    if (newCount >= 5) {
-      setShowAdmin(true);
-      setSecretClicks(0);
-    }
-  };
 
   const handleCloseWorkout = useCallback(() => {
     setShowWorkoutModal(false);
@@ -256,20 +308,73 @@ export default function App() {
 
       {showRewardsModal && user && <RewardsModal streak={user.streak} onClose={() => setShowRewardsModal(false)} />}
 
-      {showAdmin && <AdminGenerator onClose={() => setShowAdmin(false)} />}
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
 
-      {/* Novos Modais de IA */}
-      {/* Removidos showGeneralChatModal e showSabotageScannerModal */}
+
+      {/* Novos Modais de IA */} 
 
       {showPixModal.show && (
         <PixModal
           onClose={() => setShowPixModal({...showPixModal, show: false})}
           itemTitle={showPixModal.title}
           price={showPixModal.price}
-          userId={user?.uid}
         />
       )}
 
+      {showContentLibraryModal && user?.tipo_plano !== 'basic' && (
+        <ContentLibraryModal
+          onClose={() => setShowContentLibraryModal(false)}
+          detoxTeas={DETOX_TEAS}
+          sosRecipes={SOS_RECIPES}
+          sosCardio={SOS_CARDIO}
+        />
+      )}
+      {showSetGoalsModal && user && (
+        <SetGoalsModal
+          onClose={() => setShowSetGoalsModal(false)}
+          currentWaterGoal={user.waterGoal || 3000}
+          onSave={async (newGoal) => {
+            if (!user || !user.uid) {
+              console.error("[App.tsx] Usuário ou UID não definidos ao tentar salvar a meta de água.");
+              return false;
+            }
+            const result = await updateUserWaterGoal(user.uid, newGoal);
+            if (result.success) {
+              setUser(prev => prev ? { ...prev, waterGoal: newGoal } : null);
+            }
+            else {
+              console.error("[App.tsx] Erro ao salvar meta de água: ", result.error);
+            }
+            return result.success;
+          }}
+        />
+      )}
+      {showSetFastingGoalsModal && user && (
+        <SetFastingGoalModal
+          onClose={() => setShowSetFastingGoalsModal(false)}
+          currentFastingGoal={user.fastingGoal || 16}
+          onSave={async (newGoal) => {
+            if (!user || !user.uid) {
+              console.error("[App.tsx] Usuário ou UID não definidos ao tentar salvar a meta de jejum.");
+              return false;
+            }
+            const result = await updateUserFastingGoal(user.uid, newGoal);
+            if (result.success) {
+              setUser(prev => prev ? { ...prev, fastingGoal: newGoal } : null);
+            }
+            else {
+              console.error("[App.tsx] Erro ao salvar meta de jejum:", result.error);
+            }
+            return result.success;
+          }}
+        />
+      )}
       {/* --- VIEW: ONBOARDING --- */}
       {view === 'onboarding' && (
         <div className="min-h-screen bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center flex flex-col items-center justify-between p-6 text-center relative overflow-hidden">
@@ -280,7 +385,7 @@ export default function App() {
              </button>
           </div>
           <div className="relative z-10 w-full max-w-md pt-10">
-            <div className="flex justify-center mb-6" onClick={handleAdminClick}>
+            <div className="flex justify-center mb-6">
               <div className="bg-orange-600/20 p-4 rounded-full border border-orange-500/50 animate-pulse-fast cursor-pointer">
                 <Flame className="w-12 h-12 text-orange-500" />
               </div>
@@ -354,7 +459,7 @@ export default function App() {
 
           <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-20 px-4 py-3 flex justify-between items-center shadow-lg">
             <div className="flex flex-col">
-              <div className="flex items-center gap-2" onClick={handleAdminClick}>
+              <div className="flex items-center gap-2">
                 <span className="font-black tracking-tighter text-white text-lg italic">RETA FINAL</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${user.tipo_plano !== 'basic' ? 'bg-yellow-500 text-black' : 'bg-slate-700 text-slate-300'}`}>{user.tipo_plano === 'basic' ? 'Soldado' : 'General'}</span>
               </div>
@@ -401,18 +506,51 @@ export default function App() {
               <div className="flex items-center gap-2 mt-2"><Timer className="w-4 h-4 text-slate-500" /><p className="text-[10px] text-slate-500">Reseta à meia-noite</p></div>
             </Card>
 
+            {/* Histórico de Progresso Diário */}
+            <div className="space-y-4 pt-4 border-t border-slate-800/50">
+              <h3 className="text-yellow-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                <CalendarDays className="w-4 h-4 text-yellow-500" /> Histórico de Progresso
+              </h3>
+              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                {dailyProgressHistory.length === 0 ? (
+                  <p className="p-4 text-sm text-slate-500 text-center">Nenhum registro de progresso ainda.</p>
+                ) : (
+                  <div className="divide-y divide-slate-800">
+                    {dailyProgressHistory
+                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                      .map((day, idx) => (
+                        <div key={idx} className="p-4 flex items-center justify-between">
+                          <span className="text-sm font-bold text-slate-200">{new Date(day.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
+                          <div className="flex items-center gap-3">
+                            <span className={`text-xs ${day.water > 0 ? 'text-blue-400' : 'text-slate-600'}`}>💧 {day.water / 1000}L</span>
+                            <span className={`text-xs ${day.fasting ? 'text-emerald-400' : 'text-slate-600'}`}>🍴 Jejum</span>
+                            <span className={`text-xs ${day.workout ? 'text-orange-400' : 'text-slate-600'}`}>🔥 Treino</span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-3">
               <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-4"><div className="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20"><Droplets className="w-6 h-6"/></div><div><p className="font-bold text-sm text-slate-200">Hidratação</p><p className="text-xs text-slate-500 mt-0.5">{tasks.water} / {waterGoal}ml</p></div></div>
-                  <button onClick={() => setTasks(p => ({...p, water: Math.min(p.water + 500, waterGoal)}))} className="text-xs font-bold bg-blue-600 text-white px-4 py-2 rounded-lg">+500ml</button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setTasks(p => ({...p, water: Math.min(p.water + 500, waterGoal)}))} className="text-xs font-bold bg-blue-600 text-white px-4 py-2 rounded-lg">+500ml</button>
+                    <button onClick={() => {
+                      setShowSetGoalsModal(true);
+                    }} className="text-xs font-bold text-blue-400 border border-blue-600/50 px-3 py-2 rounded-lg hover:bg-blue-600/20 transition-colors">Definir Meta</button>
+                  </div>
               </div>
 
               <div onClick={() => setTasks(p => ({...p, fasting: !p.fasting}))} className={`p-4 rounded-xl border cursor-pointer flex items-center justify-between transition-colors ${tasks.fasting ? 'bg-emerald-950/30 border-emerald-500/50' : 'bg-slate-900 border-slate-800'}`}>
                   <div className="flex items-center gap-4">
                     <div className="p-2 bg-slate-800 rounded-lg shrink-0"><Utensils className={`w-6 h-6 ${tasks.fasting ? 'text-emerald-400' : 'text-slate-500'}`}/></div>
                     <div>
-                      <p className={`font-bold text-sm ${tasks.fasting ? 'text-emerald-400' : 'text-slate-200'}`}>Jejum 16h</p>
-                      <p className="text-[10px] text-slate-500 mt-1 leading-tight"><span className="text-emerald-500/80 font-bold">Liberado:</span> Água, Café e Chás (naturais).<br/><span className="text-red-500/70 font-bold">Proibido:</span> Açúcar, Adoçante ou Leite.</p>
+                      <p className={`font-bold text-sm ${tasks.fasting ? 'text-emerald-400' : 'text-slate-200'}`}>Jejum {user?.fastingGoal || 16}h</p>
+                    <p className="text-[10px] text-slate-500 mt-1 leading-tight"><span className="text-emerald-500/80 font-bold">Liberado:</span> Água, Café e Chás (naturais).<br/><span className="text-red-500/70 font-bold">Proibido:</span> Açúcar, Adoçante ou Leite.</p>
+                    <button onClick={(e) => { e.stopPropagation(); setShowSetFastingGoalsModal(true); }} className="text-xs font-bold text-emerald-400 border border-emerald-600/50 px-3 py-2 rounded-lg hover:bg-emerald-600/20 transition-colors mt-2">Definir Meta</button>
                     </div>
                   </div>
                   <CheckCircle2 className={`w-6 h-6 ${tasks.fasting ? 'text-emerald-500' : 'text-slate-700'}`} />
@@ -435,11 +573,22 @@ export default function App() {
                     
                     {/* Removidos Cards para Sala de Guerra e Scanner de Sabotagem */}
 
+                    <Card onClick={() => setShowContentLibraryModal(true)} className="cursor-pointer bg-gradient-to-br from-slate-900 to-slate-800 border-yellow-500/30">
+                      <div className="flex items-start gap-4">
+                        <MessageSquareQuote className="w-6 h-6 text-yellow-500"/>
+                        <div>
+                          <h4 className="font-bold text-white text-sm">Biblioteca de Conteúdo</h4>
+                          <p className="text-xs text-slate-400">Chás, receitas e treinos completos</p>
+                        </div>
+                      </div>
+                    </Card>
+
                     <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-yellow-500/30"><div className="flex items-start gap-4"><div className="p-2 rounded bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"><MessageSquareQuote className="w-6 h-6"/></div><div><h4 className="font-bold text-white text-sm mb-1">Mentalidade de Aço</h4><p className="text-sm text-slate-300 italic leading-relaxed">"A dor da disciplina é temporária. A dor do arrependimento é eterna."</p></div></div></Card>
                   </div>
               ) : (
                   <div className="space-y-3">
                     <LockedFeature title="Cardápio do Dia" subtitle="Liberar dieta" onClick={() => setShowUpgradeModal(true)} />
+                    <LockedFeature title="Biblioteca de Conteúdo" subtitle="Liberar acesso total" onClick={() => setShowUpgradeModal(true)} />
                     {/* Removidos LockedFeatures para Sala de Guerra e Scanner de Sabotagem */}
                   </div>
               )}
@@ -461,7 +610,7 @@ export default function App() {
                 className="text-sm shadow-xl relative"
               >
                 {user.tipo_plano === 'basic' && <Lock className="w-4 h-4 absolute left-4 text-white/50" />}
-                <AlertTriangle className="w-5 h-5" /> SOS: JACUEI A DIETA
+                <AlertTriangle className="w-5 h-5" /> SOS: FUREI A DIETA
               </Button>
             </div>
           </div>
@@ -521,7 +670,7 @@ export default function App() {
 
                     <p className="text-sm text-red-200 mb-4 italic">"{todaysSOSCardio.desc}"</p>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 mb-4">
                        {todaysSOSCardio.steps.map((step, i) => (
                           <div key={i} className="flex gap-3 bg-red-950/30 p-2 rounded items-center">
                              <span className="font-bold text-red-500 text-xs">{i+1}</span>
@@ -529,6 +678,14 @@ export default function App() {
                           </div>
                        ))}
                     </div>
+                    {todaysSOSCardio.youtubeLink && (
+                      <button
+                        onClick={() => window.open(todaysSOSCardio.youtubeLink, '_blank')}
+                        className="w-full text-xs font-bold bg-red-700 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-800 transition-colors"
+                      >
+                        VER EXECUÇÃO
+                      </button>
+                    )}
                  </div>
               </div>
 
