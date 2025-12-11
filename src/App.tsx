@@ -1,0 +1,545 @@
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import {
+  Flame, Droplets, Utensils, AlertTriangle, CheckCircle2, Lock,
+  ChefHat, Zap, ArrowRight, Gift, UserCircle, LogOut, Timer,
+  PartyPopper, Coffee, CalendarDays, MessageSquareQuote,
+  HeartPulse, ShieldAlert, Trophy 
+  // Removidos Bot, Radiation
+} from 'lucide-react';
+
+import { ViewState, Tasks, UserState, UserPlan } from './types';
+import { Button } from './components/Button';
+import { Card } from './components/Card';
+import { LockedFeature } from './components/LockedFeature';
+import { UpgradeModal } from './components/UpgradeModal';
+import { WorkoutModal } from './components/WorkoutModal';
+import { RecipeModal } from './components/RecipeModal';
+import { TutorialModal } from './components/TutorialModal';
+import { ChristmasModal } from './components/ChristmasModal';
+import { AuthModal } from './components/AuthModal';
+import { SetPasswordModal } from './components/SetPasswordModal';
+import { PixModal } from './components/PixModal';
+import { AdminGenerator } from './components/AdminGenerator';
+import { RewardsModal } from './components/RewardsModal';
+// Removidos GeneralChat e SabotageScanner
+import { auth, subscribeToUserData, logoutUser, completeTutorial } from './firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+
+// --- DADOS ESTÁTICOS ---
+
+const DETOX_TEAS = [
+  { name: "Hibisco com Gengibre", desc: "Acelerador metabólico.", recipe: "500ml água, hibisco, gengibre." },
+  { name: "Cavalinha com Limão", desc: "Adeus retenção.", recipe: "500ml água, cavalinha, limão." },
+  { name: "Chá Verde Turbo", desc: "Queima gordura.", recipe: "Chá verde + canela." },
+  { name: "Dente de Leão", desc: "Detox hepático.", recipe: "500ml água, dente de leão." }
+];
+
+const SOS_RECIPES = [
+  {
+    name: "Shot Anti-Inflamatório Turbo",
+    ingredients: ["1 limão espremido", "1 colher de café de cúrcuma", "1 pitada de pimenta preta", "50ml de água morna"],
+    prep: "Misture tudo vigorosamente e beba em jejum imediato.",
+    benefits: "Reduz inflamação sistêmica e retenção líquida instantânea."
+  },
+  {
+    name: "Chá Seca-Barriga de Hibisco",
+    ingredients: ["500ml de água", "2 colheres de sopa de hibisco", "1 pau de canela", "Gengibre em rodelas"],
+    prep: "Ferva a água com gengibre e canela. Desligue, adicione hibisco e abafe por 10min.",
+    benefits: "Diurético potente, elimina o inchaço do excesso de sódio."
+  },
+  {
+    name: "Suco Verde Detoxificante",
+    ingredients: ["1 folha de couve", "1 maçã verde", "1 pedaço de gengibre", "200ml de água de coco", "Hortelã a gosto"],
+    prep: "Bata tudo no liquidificador com gelo. Não coe para manter as fibras.",
+    benefits: "Limpeza hepática e reposição de minerais essenciais."
+  }
+];
+
+const SOS_CARDIO = [
+  {
+    title: "Caminhada em Jejum (AEJ)",
+    duration: "30 a 45 minutos",
+    intensity: "Leve/Moderada",
+    desc: "Mantenha um passo firme onde você consiga falar, mas sinta que falta um pouco de ar.",
+    steps: ["Beba 500ml de água antes.", "Não consuma nada calórico.", "Se sentir tontura, pare imediatamente."]
+  },
+  {
+    title: "HIIT Queima-Glicogênio",
+    duration: "20 minutos",
+    intensity: "Altíssima",
+    desc: "O objetivo é esvaziar os estoques de açúcar do sangue rapidamente.",
+    steps: ["3 min aquecimento leve.", "30 segundos correndo no MÁXIMO.", "30 segundos andando bem devagar.", "Repita 15 vezes."]
+  }
+];
+
+// --- COMPONENTE DO TIMER ---
+const CountdownTimer = () => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
+
+  useEffect(() => {
+    const targetDate = new Date('2026-02-17T00:00:00');
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diff = targetDate.getTime() - now.getTime();
+      if (diff > 0) {
+        setTimeLeft({
+          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+          mins: Math.floor((diff / 1000 / 60) % 60),
+          secs: Math.floor((diff / 1000) % 60),
+        });
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="bg-slate-900/60 backdrop-blur border border-slate-700/50 rounded-lg p-4 flex justify-between items-center text-slate-200 font-mono">
+      <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.days}</span><span className="text-[10px] uppercase">Dias</span></div>
+      <span className="pb-4">:</span>
+      <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.hours}</span><span className="text-[10px] uppercase">Hr</span></div>
+      <span className="pb-4">:</span>
+      <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.mins}</span><span className="text-[10px] uppercase">Min</span></div>
+      <span className="pb-4">:</span>
+      <div className="text-center"><span className="block text-2xl font-bold text-orange-500">{timeLeft.secs}</span><span className="text-[10px] uppercase">Seg</span></div>
+    </div>
+  );
+};
+
+export default function App() {
+  const [user, setUser] = useState<UserState | null>(null);
+  const [, setLoadingUser] = useState(true);
+
+  const prevUserRef = useRef<UserState | null>(null);
+
+  const [view, setView] = useState<ViewState>('onboarding');
+  const [tasks, setTasks] = useState<Tasks>({ water: 0, fasting: false, workout: false });
+
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showWorkoutModal, setShowWorkoutModal] = useState(false);
+  const [showRecipeModal, setShowRecipeModal] = useState(false);
+  const [showChristmasModal, setShowChristmasModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showRewardsModal, setShowRewardsModal] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [showPixModal, setShowPixModal] = useState<{show: boolean, title: string, price: string}>({show: false, title: '', price: ''});
+
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [secretClicks, setSecretClicks] = useState(0);
+  // Removidos showGeneralChatModal e showSabotageScannerModal
+
+  // --- EFEITOS ---
+
+  // Auth & Sync
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const unsubscribeData = subscribeToUserData(firebaseUser.uid, (data) => {
+          const today = new Date().toISOString().split('T')[0];
+          let loadedTasks = { water: 0, fasting: false, workout: false };
+          const localTasks = localStorage.getItem(`tasks_${firebaseUser.uid}_${today}`);
+          if (localTasks) loadedTasks = JSON.parse(localTasks);
+
+          const newUserState: UserState = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            tipo_plano: data?.tipo_plano || 'basic',
+            streak: data?.streak || 1,
+            lastActiveDate: data?.lastActiveDate,
+            hasSeenTutorial: data?.hasSeenTutorial || false,
+            hasChristmasAddon: data?.hasChristmasAddon || false,
+            requiresNewPassword: data?.requiresNewPassword || false
+          };
+
+          if (prevUserRef.current && prevUserRef.current.tipo_plano === 'basic' && newUserState.tipo_plano !== 'basic') {
+            setShowCelebration(true);
+            setTimeout(() => setShowCelebration(false), 5000);
+            setShowPixModal({ show: false, title: '', price: '' });
+            setShowUpgradeModal(false);
+          }
+          if (prevUserRef.current && !prevUserRef.current.hasChristmasAddon && newUserState.hasChristmasAddon) {
+             setShowCelebration(true);
+             setTimeout(() => setShowCelebration(false), 5000);
+             setShowPixModal({ show: false, title: '', price: '' });
+          }
+
+          setUser(newUserState);
+          prevUserRef.current = newUserState;
+
+          setTasks(loadedTasks);
+          setView('dashboard');
+          setLoadingUser(false);
+        });
+        return () => unsubscribeData();
+      } else {
+        setUser(null);
+        prevUserRef.current = null;
+        setView('onboarding');
+        setLoadingUser(false);
+      }
+    });
+    return () => unsubscribeAuth();
+  }, []);
+
+  // Persist Tasks
+  useEffect(() => {
+    if (user) {
+      const today = new Date().toISOString().split('T')[0];
+      localStorage.setItem(`tasks_${user.uid}_${today}`, JSON.stringify(tasks));
+    }
+  }, [tasks, user]);
+
+  // Progress logic
+  const waterGoal = 3000;
+  const progress = useMemo(() => {
+      return Math.round(((tasks.water / waterGoal) * 0.33 + (tasks.fasting ? 0.33 : 0) + (tasks.workout ? 0.33 : 0)) * 100);
+  }, [tasks, waterGoal]);
+
+  useEffect(() => {
+    if (progress >= 99 && !showCelebration) {
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 5000);
+    }
+  }, [progress, showCelebration]);
+
+  // --- LÓGICA DE NEGÓCIO ---
+
+  const todaysTea = useMemo(() => DETOX_TEAS[new Date().getDate() % DETOX_TEAS.length], []);
+  const todaysSOSRecipe = useMemo(() => SOS_RECIPES[new Date().getDate() % SOS_RECIPES.length], []);
+  const todaysSOSCardio = useMemo(() => SOS_CARDIO[new Date().getDate() % SOS_CARDIO.length], []);
+
+  const handlePurchase = (plan: UserPlan) => {
+    if (!user) { setShowAuthModal(true); return; }
+    if (plan === 'basic') { setView('dashboard'); return; }
+    if (plan === 'general') setShowUpgradeModal(true);
+  };
+
+  const startUpgradeFlow = () => {
+    setShowUpgradeModal(false);
+    setShowPixModal({
+      show: true,
+      title: "Upgrade Premium (Acesso Total)",
+      price: "R$ 29,90"
+    });
+  };
+
+  const startChristmasFlow = () => {
+    setShowPixModal({
+      show: true,
+      title: "Kit Natal Anti-Inchaço",
+      price: "R$ 14,90"
+    });
+  };
+
+  const handleAdminClick = () => {
+    const newCount = secretClicks + 1;
+    setSecretClicks(newCount);
+    if (newCount >= 5) {
+      setShowAdmin(true);
+      setSecretClicks(0);
+    }
+  };
+
+  const handleCloseWorkout = useCallback(() => {
+    setShowWorkoutModal(false);
+  }, []);
+
+  const handleCompleteWorkout = useCallback(() => {
+    setTasks(p => ({...p, workout: true}));
+    setShowWorkoutModal(false);
+  }, []);
+
+  return (
+    <>
+      {user?.requiresNewPassword && <SetPasswordModal />}
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} onSuccess={() => setShowAuthModal(false)} />}
+
+      {showRewardsModal && user && <RewardsModal streak={user.streak} onClose={() => setShowRewardsModal(false)} />}
+
+      {showAdmin && <AdminGenerator onClose={() => setShowAdmin(false)} />}
+
+      {/* Novos Modais de IA */}
+      {/* Removidos showGeneralChatModal e showSabotageScannerModal */}
+
+      {showPixModal.show && (
+        <PixModal
+          onClose={() => setShowPixModal({...showPixModal, show: false})}
+          itemTitle={showPixModal.title}
+          price={showPixModal.price}
+          userId={user?.uid}
+        />
+      )}
+
+      {/* --- VIEW: ONBOARDING --- */}
+      {view === 'onboarding' && (
+        <div className="min-h-screen bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center flex flex-col items-center justify-between p-6 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-slate-900/70" />
+          <div className="absolute top-4 right-4 z-20">
+             <button onClick={() => setShowAuthModal(true)} className="flex items-center gap-2 text-xs font-bold text-slate-300 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-700 hover:bg-slate-800 transition-colors">
+               <UserCircle className="w-4 h-4" /> Entrar
+             </button>
+          </div>
+          <div className="relative z-10 w-full max-w-md pt-10">
+            <div className="flex justify-center mb-6" onClick={handleAdminClick}>
+              <div className="bg-orange-600/20 p-4 rounded-full border border-orange-500/50 animate-pulse-fast cursor-pointer">
+                <Flame className="w-12 h-12 text-orange-500" />
+              </div>
+            </div>
+            <h1 className="text-5xl font-black mb-2 text-white uppercase italic drop-shadow-lg">Reta Final <span className="text-orange-500">2025</span></h1>
+            <p className="text-slate-300 text-lg font-medium">Sem milagres. Apenas <span className="text-white font-bold border-b-2 border-orange-500">fisiologia aplicada</span>.</p>
+          </div>
+
+          <div className="relative z-10 w-full max-w-md my-4">
+             <CountdownTimer />
+             <div className="flex justify-between items-end mb-1.5 px-1 mt-4">
+               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1"><CalendarDays className="w-3 h-3"/> Alvo: Carnaval '26</span>
+               <span className="text-[10px] uppercase font-black text-orange-500 tracking-wide animate-pulse bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">Foco Atual: Natal / Ano Novo</span>
+            </div>
+          </div>
+
+          <div className="relative z-10 w-full max-w-md space-y-4 pb-6">
+            <button onClick={() => handlePurchase('general')} className="relative w-full bg-slate-900 rounded-xl p-4 flex items-center justify-between border border-yellow-500/50 hover:bg-slate-800 transition-all active:scale-[0.98] group">
+              <div className="absolute inset-0 bg-yellow-500/5 group-hover:bg-yellow-500/10 transition-colors rounded-xl"></div>
+              <div className="text-left relative z-10">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-[10px] font-black px-2 py-0.5 rounded uppercase shadow-lg shadow-orange-500/20 flex items-center gap-1">
+                    MAIS VENDIDO <Flame className="w-3 h-3 fill-black"/>
+                  </span>
+                </div>
+                <p className="text-white font-black text-xl italic uppercase">Modo General</p>
+                <p className="text-slate-400 text-xs mt-0.5">Acesso Total + Bônus Imediatos</p>
+              </div>
+              <div className="text-right relative z-10">
+                <p className="text-slate-500 text-xs line-through font-medium mb-0.5">De R$ 97,90</p>
+                <p className="text-yellow-500 font-black text-2xl drop-shadow-sm">R$ 29,90</p>
+              </div>
+            </button>
+
+            <button onClick={() => handlePurchase('basic')} className="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 flex items-center justify-between hover:bg-slate-800/80 transition-all active:scale-[0.98]">
+              <div className="text-left">
+                <p className="text-slate-200 font-bold text-lg uppercase">Modo Soldado</p>
+                <p className="text-slate-500 text-xs mt-0.5">Apenas o essencial para começar</p>
+              </div>
+              <div className="text-right">
+                <p className="text-slate-600 text-xs line-through font-medium mb-0.5">De R$ 49,90</p>
+                <p className="text-white font-bold text-xl">R$ 9,90</p>
+              </div>
+            </button>
+
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest pt-2">
+              Compra Segura • Acesso Imediato
+            </p>
+            <p className="text-[10px] text-slate-700 font-mono">v2.1 - Stable</p>
+          </div>
+        </div>
+      )}
+
+      {/* --- VIEW: DASHBOARD --- */}
+      {view === 'dashboard' && user && (
+        <div className="min-h-screen bg-slate-950 text-slate-200 pb-32 relative">
+          {!user.hasSeenTutorial && <TutorialModal onClose={async () => { await completeTutorial(user.uid); }} />}
+
+          {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} onRedeemClick={startUpgradeFlow} />}
+          {showWorkoutModal && (
+            <WorkoutModal
+              onClose={handleCloseWorkout}
+              onComplete={handleCompleteWorkout}
+              userPlan={user.tipo_plano}
+              onUpgradeRequest={startUpgradeFlow}
+            />
+          )}
+
+          {showRecipeModal && <RecipeModal onClose={() => setShowRecipeModal(false)} dailyTea={todaysTea} />}
+          {showChristmasModal && <ChristmasModal onClose={() => setShowChristmasModal(false)} />}
+
+          <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-20 px-4 py-3 flex justify-between items-center shadow-lg">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2" onClick={handleAdminClick}>
+                <span className="font-black tracking-tighter text-white text-lg italic">RETA FINAL</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${user.tipo_plano !== 'basic' ? 'bg-yellow-500 text-black' : 'bg-slate-700 text-slate-300'}`}>{user.tipo_plano === 'basic' ? 'Soldado' : 'General'}</span>
+              </div>
+              <div className="mt-1">
+                <button
+                  onClick={() => setShowRewardsModal(true)}
+                  className="flex items-center gap-2 px-2 py-1 bg-slate-900/50 hover:bg-slate-800 rounded-lg border border-slate-700 transition-all active:scale-95 group"
+                >
+                  <Flame className="w-4 h-4 text-orange-500 fill-orange-500 animate-pulse" />
+                  <span className="text-[10px] font-bold text-orange-500">{user.streak} dias</span>
+                  <div className="w-px h-3 bg-slate-700 mx-1"></div>
+                  <Trophy className="w-3 h-3 text-yellow-500 group-hover:scale-110 transition-transform" />
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { logoutUser(); setView('onboarding'); }} className="text-slate-500 hover:text-white p-2"><LogOut className="w-5 h-5"/></button>
+            </div>
+          </header>
+
+          <main className="p-4 space-y-6 max-w-md mx-auto mt-2">
+            {showCelebration && (
+              <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/20" />
+                <div className="animate-in zoom-in duration-500 text-center">
+                  <PartyPopper className="w-32 h-32 text-yellow-500 animate-bounce mx-auto" /><h2 className="text-4xl font-black text-white uppercase italic drop-shadow-[0_0_20px_rgba(234,179,8,0.8)]">MISSÃO CUMPRIDA!</h2>
+                </div>
+              </div>
+            )}
+
+            <div className="animate-in fade-in slide-in-from-top-4 duration-700 relative">
+               <button onClick={user.hasChristmasAddon ? () => setShowChristmasModal(true) : startChristmasFlow} className={`w-full bg-gradient-to-r from-red-900 to-slate-900 border ${!user.hasChristmasAddon ? 'border-yellow-500/50' : 'border-red-500/30'} p-4 rounded-xl flex items-center justify-between shadow-lg shadow-red-900/20 group hover:border-red-500/50 transition-all relative overflow-hidden`}>
+                  <div className="flex items-center gap-3">
+                      <div className="relative"><Gift className="w-6 h-6 text-red-400" />{!user.hasChristmasAddon && (<div className="absolute -top-2 -right-2 bg-yellow-500 rounded-full p-1 border border-black shadow"><Lock className="w-2 h-2 text-black" /></div>)}</div>
+                      <div className="text-left"><span className="text-white font-bold uppercase text-sm block">Protocolo de Natal</span>{!user.hasChristmasAddon ? (<span className="text-[10px] text-yellow-500 font-bold uppercase">Comprar: R$ 14,90</span>) : (<span className="text-[10px] text-green-400 font-bold uppercase">Liberado</span>)}</div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-red-400" />
+                </button>
+            </div>
+
+            <Card className="relative overflow-visible">
+              <div className="flex justify-between items-end mb-2 relative z-10"><h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Consistência</h2><span className="text-3xl font-black text-white italic">{progress}%</span></div>
+              <div className="h-4 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700 relative z-10"><div className={`h-full transition-all duration-700 ease-out bg-gradient-to-r from-orange-500 via-red-500 to-orange-600`} style={{ width: `${progress}%` }} /></div>
+              <div className="flex items-center gap-2 mt-2"><Timer className="w-4 h-4 text-slate-500" /><p className="text-[10px] text-slate-500">Reseta à meia-noite</p></div>
+            </Card>
+
+            <div className="space-y-3">
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between shadow-sm">
+                  <div className="flex items-center gap-4"><div className="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20"><Droplets className="w-6 h-6"/></div><div><p className="font-bold text-sm text-slate-200">Hidratação</p><p className="text-xs text-slate-500 mt-0.5">{tasks.water} / {waterGoal}ml</p></div></div>
+                  <button onClick={() => setTasks(p => ({...p, water: Math.min(p.water + 500, waterGoal)}))} className="text-xs font-bold bg-blue-600 text-white px-4 py-2 rounded-lg">+500ml</button>
+              </div>
+
+              <div onClick={() => setTasks(p => ({...p, fasting: !p.fasting}))} className={`p-4 rounded-xl border cursor-pointer flex items-center justify-between transition-colors ${tasks.fasting ? 'bg-emerald-950/30 border-emerald-500/50' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-slate-800 rounded-lg shrink-0"><Utensils className={`w-6 h-6 ${tasks.fasting ? 'text-emerald-400' : 'text-slate-500'}`}/></div>
+                    <div>
+                      <p className={`font-bold text-sm ${tasks.fasting ? 'text-emerald-400' : 'text-slate-200'}`}>Jejum 16h</p>
+                      <p className="text-[10px] text-slate-500 mt-1 leading-tight"><span className="text-emerald-500/80 font-bold">Liberado:</span> Água, Café e Chás (naturais).<br/><span className="text-red-500/70 font-bold">Proibido:</span> Açúcar, Adoçante ou Leite.</p>
+                    </div>
+                  </div>
+                  <CheckCircle2 className={`w-6 h-6 ${tasks.fasting ? 'text-emerald-500' : 'text-slate-700'}`} />
+              </div>
+
+              <div className={`p-4 rounded-xl border flex items-center justify-between ${tasks.workout ? 'bg-emerald-950/30 border-emerald-500/50' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className="flex items-center gap-4 cursor-pointer flex-1" onClick={() => setShowWorkoutModal(true)}>
+                    <div className="p-2 bg-slate-800 rounded-lg"><Flame className={`w-6 h-6 ${tasks.workout ? 'text-emerald-400' : 'text-slate-500'}`}/></div>
+                    <div><p className={`font-bold text-sm ${tasks.workout ? 'text-emerald-400' : 'text-slate-200'} underline decoration-dotted`}>Treino Metabólico</p><p className="text-xs text-slate-500">Clique para ver execução</p></div>
+                  </div>
+                  <CheckCircle2 className={`w-6 h-6 ${tasks.workout ? 'text-emerald-500' : 'text-slate-700'}`} />
+              </div>
+            </div>
+
+            <div className="space-y-4 pt-4 border-t border-slate-800/50">
+              <div className="flex justify-between items-center"><div className="flex items-center gap-2"><Zap className="w-4 h-4 text-yellow-500" /><h3 className="text-yellow-500 text-xs font-bold uppercase tracking-widest">Aceleradores (Premium)</h3></div>{user.tipo_plano === 'basic' && <Lock className="w-3 h-3 text-yellow-600" />}</div>
+              {user.tipo_plano !== 'basic' ? (
+                  <div className="space-y-3">
+                    <Card onClick={() => setShowRecipeModal(true)} className="cursor-pointer border-yellow-500/30"><div className="flex items-start gap-4"><ChefHat className="w-6 h-6 text-yellow-500"/><div><h4 className="font-bold text-white text-sm">Almoço Metabólico</h4><p className="text-xs text-slate-400">Ver receita do dia</p></div></div></Card>
+                    
+                    {/* Removidos Cards para Sala de Guerra e Scanner de Sabotagem */}
+
+                    <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-yellow-500/30"><div className="flex items-start gap-4"><div className="p-2 rounded bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"><MessageSquareQuote className="w-6 h-6"/></div><div><h4 className="font-bold text-white text-sm mb-1">Mentalidade de Aço</h4><p className="text-sm text-slate-300 italic leading-relaxed">"A dor da disciplina é temporária. A dor do arrependimento é eterna."</p></div></div></Card>
+                  </div>
+              ) : (
+                  <div className="space-y-3">
+                    <LockedFeature title="Cardápio do Dia" subtitle="Liberar dieta" onClick={() => setShowUpgradeModal(true)} />
+                    {/* Removidos LockedFeatures para Sala de Guerra e Scanner de Sabotagem */}
+                  </div>
+              )}
+            </div>
+          </main>
+
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent z-30">
+            <div className="max-w-md mx-auto relative">
+              <Button
+                variant="danger"
+                fullWidth
+                onClick={() => {
+                  if (user.tipo_plano === 'basic') {
+                    startUpgradeFlow();
+                  } else {
+                    setView('panic');
+                  }
+                }}
+                className="text-sm shadow-xl relative"
+              >
+                {user.tipo_plano === 'basic' && <Lock className="w-4 h-4 absolute left-4 text-white/50" />}
+                <AlertTriangle className="w-5 h-5" /> SOS: JACUEI A DIETA
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- VIEW: PANIC (SOS) --- */}
+      {view === 'panic' && (
+        <div className="min-h-screen bg-red-950 text-white overflow-y-auto pb-8">
+           <div className="p-6 text-center border-b border-red-900/50 bg-red-950/90 backdrop-blur sticky top-0 z-20">
+              <div className="flex justify-center mb-2">
+                 <div className="p-3 bg-red-900/50 rounded-full animate-bounce">
+                    <ShieldAlert className="w-12 h-12 text-red-500" />
+                 </div>
+              </div>
+              <h2 className="text-3xl font-black uppercase italic drop-shadow-lg">Protocolo SOS</h2>
+              <p className="text-red-200 text-sm mt-1">Sua rota de fuga para voltar ao jogo.</p>
+           </div>
+
+           <div className="p-4 space-y-6 max-w-md mx-auto">
+              <div className="bg-red-900/30 border border-red-800 rounded-xl overflow-hidden shadow-lg">
+                 <div className="bg-red-900/50 p-3 flex items-center gap-2 border-b border-red-800">
+                    <Coffee className="w-5 h-5 text-red-300" />
+                    <h3 className="font-bold uppercase text-sm tracking-wide text-red-100">O Antídoto de Hoje</h3>
+                 </div>
+                 <div className="p-4">
+                    <h4 className="text-xl font-bold text-white mb-2">{todaysSOSRecipe.name}</h4>
+                    <p className="text-xs text-red-300 italic mb-4">{todaysSOSRecipe.benefits}</p>
+
+                    <div className="space-y-2 mb-4">
+                       {todaysSOSRecipe.ingredients.map((ing, i) => (
+                          <div key={i} className="flex gap-2 text-sm text-red-100 items-start">
+                             <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0" />
+                             {ing}
+                          </div>
+                       ))}
+                    </div>
+
+                    <div className="bg-red-950/50 p-3 rounded-lg border border-red-900">
+                       <p className="text-xs text-red-200 font-bold mb-1">PREPARO:</p>
+                       <p className="text-sm text-red-100 leading-relaxed">{todaysSOSRecipe.prep}</p>
+                    </div>
+                 </div>
+              </div>
+
+              <div className="bg-red-900/30 border border-red-800 rounded-xl overflow-hidden shadow-lg">
+                 <div className="bg-red-900/50 p-3 flex items-center gap-2 border-b border-red-800">
+                    <HeartPulse className="w-5 h-5 text-red-300" />
+                    <h3 className="font-bold uppercase text-sm tracking-wide text-red-100">Movimento Obrigatório</h3>
+                 </div>
+                 <div className="p-4">
+                    <h4 className="text-xl font-bold text-white mb-1">{todaysSOSCardio.title}</h4>
+                    <div className="flex gap-2 mb-3">
+                       <span className="text-[10px] bg-red-950 border border-red-800 px-2 py-0.5 rounded text-red-300 uppercase">{todaysSOSCardio.duration}</span>
+                       <span className="text-[10px] bg-red-950 border border-red-800 px-2 py-0.5 rounded text-red-300 uppercase">{todaysSOSCardio.intensity}</span>
+                    </div>
+
+                    <p className="text-sm text-red-200 mb-4 italic">"{todaysSOSCardio.desc}"</p>
+
+                    <div className="space-y-2">
+                       {todaysSOSCardio.steps.map((step, i) => (
+                          <div key={i} className="flex gap-3 bg-red-950/30 p-2 rounded items-center">
+                             <span className="font-bold text-red-500 text-xs">{i+1}</span>
+                             <p className="text-sm text-red-100">{step}</p>
+                          </div>
+                       ))}
+                    </div>
+                 </div>
+              </div>
+
+              <div className="space-y-3">
+                 <Button variant="outline-danger" fullWidth onClick={() => setView('dashboard')}>
+                   VOLTAR AO FOCO
+                 </Button>
+              </div>
+           </div>
+        </div>
+      )}
+    </>
+  );
+}
