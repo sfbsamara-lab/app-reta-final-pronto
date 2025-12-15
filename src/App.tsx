@@ -20,6 +20,8 @@ import { SetPasswordModal } from './components/SetPasswordModal';
 import { PixModal } from './components/PixModal';
 import { RewardsModal } from './components/RewardsModal';
 import { Notification } from './components/Notification';
+import NotificationsSettingsModal from './components/NotificationsSettingsModal';
+import { Settings } from 'lucide-react';
 import { ContentLibraryModal } from './components/ContentLibraryModal';
 import { SetGoalsModal } from './components/SetGoalsModal';
 import { SetFastingGoalModal } from './components/SetFastingGoalModal';
@@ -174,6 +176,7 @@ export default function App() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [dailyProgressHistory, setDailyProgressHistory] = useState<DailyProgress[]>([]);
   const [notification, setNotification] = useState<{ message: string; type?: 'success' | 'error' | 'info' | 'warning' } | null>(null);
+  const [showNotificationsSettings, setShowNotificationsSettings] = useState(false);
   const [showContentLibraryModal, setShowContentLibraryModal] = useState(false);
   const [showSetGoalsModal, setShowSetGoalsModal] = useState(false);
   const [showSetFastingGoalsModal, setShowSetFastingGoalsModal] = useState(false);
@@ -318,7 +321,28 @@ export default function App() {
     }
   };
 
+  const isReminderEnabled = (type: 'water' | 'workout' | 'flame') => {
+    // Prefer settings saved on user doc
+    if (user && (user as any).notificationSettings) {
+      const s = (user as any).notificationSettings as Record<string, boolean>;
+      if (s[type] !== undefined) return !!s[type];
+    }
+
+    // Fallback to localStorage
+    try {
+      const raw = localStorage.getItem('notificationSettings');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed[type] !== undefined) return !!parsed[type];
+      }
+    } catch (e) {}
+
+    return true; // default on
+  };
+
   const sendReminder = async (type: 'water' | 'workout' | 'flame') => {
+    if (!isReminderEnabled(type)) return;
+
     if (type === 'water') {
       setNotification({ message: 'Lembre-se de beber água para alcançar sua meta de hoje.', type: 'info' });
     } else if (type === 'workout') {
@@ -571,6 +595,7 @@ export default function App() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button onClick={() => setShowNotificationsSettings(true)} className="text-slate-500 hover:text-white p-2"><Settings className="w-5 h-5"/></button>
               <button onClick={() => { logoutUser(); setView('onboarding'); }} className="text-slate-500 hover:text-white p-2"><LogOut className="w-5 h-5"/></button>
             </div>
           </header>
@@ -584,6 +609,7 @@ export default function App() {
                 </div>
               </div>
             )}
+            {showNotificationsSettings && <NotificationsSettingsModal onClose={() => setShowNotificationsSettings(false)} />}
 
             <div className="animate-in fade-in slide-in-from-top-4 duration-700 relative">
                <button onClick={user.hasChristmasAddon ? () => setShowChristmasModal(true) : startChristmasFlow} className={`w-full bg-gradient-to-r from-red-900 to-slate-900 border ${!user.hasChristmasAddon ? 'border-yellow-500/50' : 'border-red-500/30'} p-4 rounded-xl flex items-center justify-between shadow-lg shadow-red-900/20 group hover:border-red-500/50 transition-all relative overflow-hidden`}>

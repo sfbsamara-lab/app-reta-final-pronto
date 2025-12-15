@@ -19,6 +19,7 @@ export interface UserState {
   requiresNewPassword?: boolean;
   waterGoal?: number; // Nova meta de água personalizada
   fastingGoal?: number; // Nova meta de jejum personalizada (em horas)
+  notificationSettings?: { water?: boolean; workout?: boolean; flame?: boolean };
 }
 
 export interface DailyProgress {
