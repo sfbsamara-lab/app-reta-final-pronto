@@ -25,7 +25,7 @@ import { Settings } from 'lucide-react';
 import { ContentLibraryModal } from './components/ContentLibraryModal';
 import { SetGoalsModal } from './components/SetGoalsModal';
 import { SetFastingGoalModal } from './components/SetFastingGoalModal';
-import { auth, db, subscribeToUserData, logoutUser, completeTutorial, saveDailyProgress, getAllDailyProgress, updateUserWaterGoal, updateUserFastingGoal } from './firebase';
+import { auth, db, subscribeToUserData, logoutUser, completeTutorial, saveDailyProgress, getAllDailyProgress, updateUserWaterGoal, updateUserFastingGoal, touchUserActiveDay } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
@@ -186,8 +186,14 @@ export default function App() {
 
   // Auth & Sync
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        try {
+          await touchUserActiveDay(firebaseUser.uid);
+        } catch (e) {
+          console.warn('[Auth] touchUserActiveDay falhou:', e);
+        }
+
         const unsubscribeData = subscribeToUserData(firebaseUser.uid, (data) => {
           const today = new Date().toISOString().split('T')[0];
           let loadedTasks = { water: 0, fasting: false, workout: false };
@@ -215,6 +221,12 @@ export default function App() {
              setShowCelebration(true);
              setTimeout(() => setShowCelebration(false), 5000);
              setShowPixModal({ show: false, title: '', price: '' });
+          }
+
+          // Se o streak aumentou em relação ao estado anterior, celebra!
+          if (prevUserRef.current && newUserState.streak > prevUserRef.current.streak) {
+            setShowCelebration(true);
+            setTimeout(() => setShowCelebration(false), 5000);
           }
 
           setUser(newUserState);

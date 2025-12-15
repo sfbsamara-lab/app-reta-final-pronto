@@ -455,6 +455,32 @@ export const getAllDailyProgress = async (uid: string) => {
   }
 };
 
+// Atualiza lastActiveDate e streak baseado em último acesso
+export const touchUserActiveDay = async (uid: string) => {
+  try {
+    const userRef = doc(db, 'users', uid);
+    const snap = await getDoc(userRef);
+    const data = snap.exists() ? snap.data() as any : {};
+
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    // Se já marcou hoje, nada a fazer
+    if (data?.lastActiveDate === today) return { updated: false };
+
+    let newStreak = 1;
+    if (data?.lastActiveDate === yesterday) {
+      newStreak = (data?.streak || 0) + 1;
+    }
+
+    await setDoc(userRef, { streak: newStreak, lastActiveDate: today }, { merge: true });
+    return { updated: true, streak: newStreak };
+  } catch (e: any) {
+    console.error('Erro em touchUserActiveDay:', e);
+    return { updated: false, error: e?.message };
+  }
+};
+
 // --- FUNÇÃO PARA ATUALIZAR A META DE ÁGUA DO USUÁRIO ---
 export const updateUserWaterGoal = async (uid: string, newGoal: number) => {
   try {
