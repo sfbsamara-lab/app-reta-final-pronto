@@ -427,7 +427,7 @@ export default function App() {
               <div className="text-left relative z-10">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-[10px] font-black px-2 py-0.5 rounded uppercase shadow-lg shadow-orange-500/20 flex items-center gap-1">
-                    MAIS VENDIDO <Flame className="w-3 h-3 fill-black"/>
+                    OFERTA LIMITADA ⏳ <Flame className="w-3 h-3 fill-black"/>
                   </span>
                 </div>
                 <p className="text-white font-black text-xl italic uppercase">Modo General</p>
