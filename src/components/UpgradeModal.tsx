@@ -37,8 +37,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onRedeemCli
 
         <div className="p-6 space-y-4 relative z-10 bg-slate-900/50">
           <p className="text-slate-300 text-center text-sm leading-relaxed font-medium">
-            Você está operando no <span className="text-slate-400 font-bold">Modo Soldado (Básico)</span>. 
-            <br/>Para acessar o arsenal completo de guerra, você precisa da credencial General.
+            Você está com acesso limitado. <br/>Atualize para <span className="text-slate-400 font-bold">Modo General</span> e tenha Acesso TOTAL.
           </p>
 
           <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-800 space-y-3">

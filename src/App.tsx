@@ -110,7 +110,8 @@ const CountdownTimer = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
 
   useEffect(() => {
-    const targetDate = new Date('2026-02-17T00:00:00');
+    // Contador da Promoção de Lançamento — termina em 21/12 (72 horas)
+    const targetDate = new Date('2025-12-21T23:59:59');
     const interval = setInterval(() => {
       const now = new Date();
       const diff = targetDate.getTime() - now.getTime();
@@ -121,6 +122,9 @@ const CountdownTimer = () => {
           mins: Math.floor((diff / 1000 / 60) % 60),
           secs: Math.floor((diff / 1000) % 60),
         });
+      } else {
+        // quando passar a data, zera o contador
+        setTimeLeft({ days: 0, hours: 0, mins: 0, secs: 0 });
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -391,14 +395,15 @@ export default function App() {
               </div>
             </div>
             <h1 className="text-5xl font-black mb-2 text-white uppercase italic drop-shadow-lg">Reta Final <span className="text-orange-500">2025</span></h1>
-            <p className="text-slate-300 text-lg font-medium">Sem milagres. Apenas <span className="text-white font-bold border-b-2 border-orange-500">fisiologia aplicada</span>.</p>
+            <p className="text-slate-300 text-lg font-medium">Rotina Reta Final. <span className="text-white font-bold border-b-2 border-orange-500">Resultados Reais com apenas 15 minutos por dia</span></p>
           </div>
 
           <div className="relative z-10 w-full max-w-md my-4">
+             <div className="text-xs text-slate-400 mb-2 font-bold">Promoção de Lançamento — termina em 21/12 (72 horas)</div>
              <CountdownTimer />
              <div className="flex justify-between items-end mb-1.5 px-1 mt-4">
                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1"><CalendarDays className="w-3 h-3"/> Alvo: Carnaval '26</span>
-               <span className="text-[10px] uppercase font-black text-orange-500 tracking-wide animate-pulse bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">Foco Atual: Natal / Ano Novo</span>
+               <span className="text-[10px] uppercase font-black text-orange-500 tracking-wide animate-pulse bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">Promoção ativa até 21/12</span>
             </div>
           </div>
 
@@ -412,7 +417,7 @@ export default function App() {
                   </span>
                 </div>
                 <p className="text-white font-black text-xl italic uppercase">Modo General</p>
-                <p className="text-slate-400 text-xs mt-0.5">Acesso Total + Bônus Imediatos</p>
+                <p className="text-slate-400 text-xs mt-0.5">Acesso TOTAL - Inclui o Protocolo SOS Pós-Festas [GRÁTIS]</p>
               </div>
               <div className="text-right relative z-10">
                 <p className="text-slate-500 text-xs line-through font-medium mb-0.5">De R$ 97,90</p>
@@ -420,16 +425,7 @@ export default function App() {
               </div>
             </button>
 
-            <button onClick={() => handlePurchase('basic')} className="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 flex items-center justify-between hover:bg-slate-800/80 transition-all active:scale-[0.98]">
-              <div className="text-left">
-                <p className="text-slate-200 font-bold text-lg uppercase">Modo Soldado</p>
-                <p className="text-slate-500 text-xs mt-0.5">Apenas o essencial para começar</p>
-              </div>
-              <div className="text-right">
-                <p className="text-slate-600 text-xs line-through font-medium mb-0.5">De R$ 49,90</p>
-                <p className="text-white font-bold text-xl">R$ 9,90</p>
-              </div>
-            </button>
+
 
             <p className="text-[10px] text-slate-500 uppercase tracking-widest pt-2">
               Compra Segura • Acesso Imediato

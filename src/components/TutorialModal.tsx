@@ -67,7 +67,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <div>
               <h3 className="text-white font-bold text-sm uppercase">Cadeados (Premium)</h3>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Recursos avançados como o Arsenal de elite (Receitas e Áudios) e a <strong className="text-yellow-400">Biblioteca de Conteúdos</strong> estão disponíveis. Além disso, botões <strong className="text-yellow-400">"Ver Execução"</strong> em alguns treinos e no SOS levam a vídeos explicativos. Desbloqueie tudo ativando o <strong className="text-yellow-500">Modo General</strong>.
+                Recursos avançados como o Arsenal de elite (Receitas e Áudios) e a <strong className="text-yellow-400">Biblioteca de Conteúdos</strong> estão disponíveis. Além disso, botões <strong className="text-yellow-400">"Ver Execução"</strong> em alguns treinos e no SOS levam a vídeos explicativos. Desbloqueie tudo ativando o <strong className="text-yellow-500">Modo General - Acesso TOTAL - Inclui o Protocolo SOS Pós-Festas [GRÁTIS]</strong>.
               </p>
             </div>
           </div>
