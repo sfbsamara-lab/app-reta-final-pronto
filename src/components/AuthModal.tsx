@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Lock, Mail, ArrowRight, Loader2, AlertCircle, HelpCircle } from 'lucide-react';
 import { Button } from './Button';
 import { loginUser, registerSimple, resetPassword } from '../firebase'; 
@@ -17,6 +17,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess, initia
   const canShowRegister = initialTab === 'register' || allowedByUrl;
 
   const [activeTab, setActiveTab] = useState<'login' | 'register' | 'reset'>(initialTab === 'register' || allowedByUrl ? 'register' : 'login');
+
+  // Caso o componente seja montado enquanto já estivermos na rota secreta, garante que a aba ativa seja 'register'
+  useEffect(() => {
+    if (allowedByUrl) setActiveTab('register');
+  }, [allowedByUrl]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -82,13 +87,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess, initia
 
         {/* Tabs */}
         <div className="flex border-b border-slate-800">
-          <button 
-            type="button"
-            onClick={() => { setActiveTab('login'); setError(null); setSuccessMsg(null); }}
-            className={`flex-1 py-4 text-sm font-bold uppercase transition-colors ${activeTab === 'login' ? 'bg-slate-800 text-white border-b-2 border-orange-500' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            Entrar
-          </button>
+          {/* Se estamos na rota secreta, só mostramos a aba de cadastro para evitar confusão */}
+          {!allowedByUrl && (
+            <button 
+              type="button"
+              onClick={() => { setActiveTab('login'); setError(null); setSuccessMsg(null); }}
+              className={`flex-1 py-4 text-sm font-bold uppercase transition-colors ${activeTab === 'login' ? 'bg-slate-800 text-white border-b-2 border-orange-500' : 'text-slate-500 hover:text-slate-300'}`}
+            >
+              Entrar
+            </button>
+          )}
+
           {canShowRegister && (
             <button 
               type="button"
