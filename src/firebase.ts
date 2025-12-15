@@ -227,15 +227,21 @@ export const registerSimple = async (email: string, pass: string) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const uid = userCredential.user.uid;
-
     const userDocRef = doc(db, "users", uid);
+
+    // Promoção de lançamento: todos os cadastros entre 15/12/2025 e 22/12/2025 ganham Premium + Protocolo de Natal
+    const now = new Date();
+    const promoStart = new Date('2025-12-15T00:00:00');
+    const promoEnd = new Date('2025-12-22T23:59:59');
+    const inLaunchPromo = now >= promoStart && now <= promoEnd;
+
     const newUserData: UserData = {
       email,
-      tipo_plano: 'basic',
+      tipo_plano: inLaunchPromo ? 'general' : 'basic',
       streak: 0,
       lastActiveDate: new Date().toISOString().split('T')[0],
       hasSeenTutorial: false,
-      hasChristmasAddon: false,
+      hasChristmasAddon: !!inLaunchPromo,
       requiresNewPassword: false,
       createdAt: serverTimestamp(),
       waterGoal: 3000,
