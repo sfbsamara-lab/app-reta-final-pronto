@@ -100,7 +100,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
             </h2>
             <p className="text-xs text-slate-400 mt-1">
               {activeTab === 'login' && "Bem-vindo de volta."}
-              {activeTab === 'register' && "Crie sua conta com e-mail e senha. Após o pagamento via PIX seu plano será atualizado."}
+              {activeTab === 'register' && "Crie sua conta com e-mail e senha."}
               {activeTab === 'reset' && "Enviaremos um link para seu e-mail."}
             </p>
           </div>
