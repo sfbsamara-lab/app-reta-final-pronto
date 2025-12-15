@@ -6,10 +6,17 @@ import { loginUser, registerSimple, resetPassword } from '../firebase';
 interface AuthModalProps {
   onClose: () => void;
   onSuccess: () => void;
+  initialTab?: 'login' | 'register';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
-  const [activeTab, setActiveTab] = useState<'login' | 'register' | 'reset'>('login');
+export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess, initialTab }) => {
+  // Determina se a aba de cadastro deve aparecer (rota secreta ou parâmetro)
+  const isBrowser = typeof window !== 'undefined';
+  // Permite cadastro apenas quando a rota exata /cadastro-vip for acessada
+  const allowedByUrl = isBrowser && window.location.pathname === '/cadastro-vip';
+  const canShowRegister = initialTab === 'register' || allowedByUrl;
+
+  const [activeTab, setActiveTab] = useState<'login' | 'register' | 'reset'>(initialTab === 'register' || allowedByUrl ? 'register' : 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -82,13 +89,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
           >
             Entrar
           </button>
-          <button 
-            type="button"
-            onClick={() => { setActiveTab('register'); setError(null); setSuccessMsg(null); }}
-            className={`flex-1 py-4 text-sm font-bold uppercase transition-colors ${activeTab === 'register' ? 'bg-slate-800 text-white border-b-2 border-orange-500' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            Cadastrar
-          </button>
+          {canShowRegister && (
+            <button 
+              type="button"
+              onClick={() => { setActiveTab('register'); setError(null); setSuccessMsg(null); }}
+              className={`flex-1 py-4 text-sm font-bold uppercase transition-colors ${activeTab === 'register' ? 'bg-slate-800 text-white border-b-2 border-orange-500' : 'text-slate-500 hover:text-slate-300'}`}
+            >
+              Cadastrar
+            </button>
+          )}
         </div>
 
         <div className="p-6">

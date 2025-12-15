@@ -18,3 +18,11 @@ View your app in AI Studio: https://ai.studio/apps/drive/1eL49WZmAfeYdEZqur4-Kj9
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Rota secreta de cadastro
+
+Para permitir cadastros apenas a clientes pagantes, existe uma rota secreta que abre o formulário de cadastro diretamente:
+
+- `https://<sua-app>.vercel.app/cadastro-vip` — abre a aba de "Cadastrar" (somente para visitantes não autenticados).
+
+No restante do site (raiz `/`) o modal de autenticação mostra apenas a aba de login.

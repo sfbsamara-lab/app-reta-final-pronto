@@ -157,6 +157,17 @@ export default function App() {
   const [showRecipeModal, setShowRecipeModal] = useState(false);
   const [showChristmasModal, setShowChristmasModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authInitialTab, setAuthInitialTab] = useState<'login' | 'register' | undefined>(undefined);
+
+  // Abre automaticamente o modal de cadastro se a rota/param secreta for usada
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const isVipRoute = window.location.pathname === '/cadastro-vip';
+    if (isVipRoute && !user) {
+      setAuthInitialTab('register');
+      setShowAuthModal(true);
+    }
+  }, [user]);
   const [showRewardsModal, setShowRewardsModal] = useState(false);
   const [showPixModal, setShowPixModal] = useState<{show: boolean, title: string, price: string}>({show: false, title: '', price: ''});
   const [showCelebration, setShowCelebration] = useState(false);
@@ -273,7 +284,8 @@ export default function App() {
   const todaysSOSCardio = useMemo(() => SOS_CARDIO[new Date().getDate() % SOS_CARDIO.length], []);
 
   const handlePurchase = (plan: UserPlan) => {
-    if (!user) { setShowAuthModal(true); return; }
+    // Ao iniciar compra sem estar logado, abre o modal em LOGIN (não expor cadastro)
+    if (!user) { setAuthInitialTab('login'); setShowAuthModal(true); return; }
     if (plan === 'basic') { setView('dashboard'); return; }
     if (plan === 'general') setShowUpgradeModal(true);
   };
@@ -308,7 +320,7 @@ export default function App() {
   return (
     <>
       {user?.requiresNewPassword && <SetPasswordModal />}
-      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} onSuccess={() => setShowAuthModal(false)} />}
+{showAuthModal && <AuthModal onClose={() => { setShowAuthModal(false); setAuthInitialTab(undefined); }} onSuccess={() => { setShowAuthModal(false); setAuthInitialTab(undefined); }} initialTab={authInitialTab} /> }
 
       {showRewardsModal && user && <RewardsModal streak={user.streak} onClose={() => setShowRewardsModal(false)} />}
 
@@ -384,7 +396,7 @@ export default function App() {
         <div className="min-h-screen bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center flex flex-col items-center justify-between p-6 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/90 to-slate-900/70" />
           <div className="absolute top-4 right-4 z-20">
-             <button onClick={() => setShowAuthModal(true)} className="flex items-center gap-2 text-xs font-bold text-slate-300 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-700 hover:bg-slate-800 transition-colors">
+             <button onClick={() => { setAuthInitialTab('login'); setShowAuthModal(true); }} className="flex items-center gap-2 text-xs font-bold text-slate-300 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-700 hover:bg-slate-800 transition-colors">
                <UserCircle className="w-4 h-4" /> Entrar
              </button>
           </div>
