@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, QrCode, Copy, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from './Button';
-import { generatePixPayment } from '../firebase'; 
+import { generatePixPayment, grantPremiumToUser, auth } from '../firebase'; 
 
 interface PixModalProps {
   onClose: () => void;
@@ -40,13 +40,23 @@ export const PixModal: React.FC<PixModalProps> = ({ onClose, itemTitle, price}) 
   const handleVerify = () => {
     setStep('verifying');
     // Simulação de verificação
-    setTimeout(() => {
-      // Aqui você poderia redirecionar para um WhatsApp de suporte
-      // ou apenas fechar o modal dizendo que está processando
+    setTimeout(async () => {
+      // Simulação de verificação: conceder o premium ao usuário logado
+      if (auth.currentUser && auth.currentUser.uid) {
+        const uid = auth.currentUser.uid;
+        const res = await grantPremiumToUser(uid);
+        if (res.success) {
+          alert('Pagamento confirmado — seu acesso PREMIUM e o Protocolo de Natal foram ativados.');
+        } else {
+          alert('Pagamento confirmado, mas houve um erro ao ativar seu plano. Contate o suporte.');
+        }
+      } else {
+        alert('Pagamento confirmado. Faça login ou crie sua conta para liberar o acesso.');
+      }
       onClose();
-      alert("Pagamento em processamento! Seu acesso será liberado em instantes.");
     }, 2000);
   };
+
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
@@ -97,6 +107,8 @@ export const PixModal: React.FC<PixModalProps> = ({ onClose, itemTitle, price}) 
             <Button fullWidth onClick={handleVerify} className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200">
               JÁ FIZ O PAGAMENTO
             </Button>
+
+
           </div>
         )}
 

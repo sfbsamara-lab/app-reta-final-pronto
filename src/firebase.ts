@@ -186,7 +186,7 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
       streak: 0,
       lastActiveDate: new Date().toISOString().split('T')[0],
       hasSeenTutorial: false,
-      hasChristmasAddon: codeData.type === 'addon' || codeData.value === 'christmas',
+      hasChristmasAddon: codeData.grantChristmas === true || codeData.type === 'addon' || codeData.value === 'christmas',
       requiresNewPassword: false,
       createdAt: serverTimestamp(),
       waterGoal: 3000, // Meta de água padrão para novos usuários
@@ -222,17 +222,72 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
   }
 };
 
+// Registro simples sem código — cria usuário com plano básico
+export const registerSimple = async (email: string, pass: string) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid = userCredential.user.uid;
+
+    const userDocRef = doc(db, "users", uid);
+    const newUserData: UserData = {
+      email,
+      tipo_plano: 'basic',
+      streak: 0,
+      lastActiveDate: new Date().toISOString().split('T')[0],
+      hasSeenTutorial: false,
+      hasChristmasAddon: false,
+      requiresNewPassword: false,
+      createdAt: serverTimestamp(),
+      waterGoal: 3000,
+      fastingGoal: 16
+    };
+
+    await setDoc(userDocRef, newUserData);
+    return { user: userCredential.user };
+  } catch (error: any) {
+    console.error("Erro no registro simples:", error);
+    let msg = "Falha no registro.";
+    if (error.code === 'auth/email-already-in-use') msg = "E-mail já está em uso.";
+    if (error.code === 'auth/weak-password') msg = "Senha muito fraca (mín 6 chars).";
+    return { error: msg };
+  }
+};
+
+// Concede o plano premium e o Protocolo de Natal ao usuário (usado após confirmação de pagamento)
+export const grantPremiumToUser = async (uid: string) => {
+  try {
+    const userRef = doc(db, 'users', uid);
+    await setDoc(userRef, { tipo_plano: 'general', hasChristmasAddon: true }, { merge: true });
+    return { success: true };
+  } catch (error: any) {
+    console.error('Erro ao conceder premium:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 // --- ADMIN / GERAÇÃO DE CÓDIGOS ---
 
-export const createAccessCode = async (code: string, type: 'plan' | 'addon', value: string, uses: number) => {
+export interface AccessCodeOptions {
+  grantChristmas?: boolean;
+  // future flags can be added here
+}
+
+export const createAccessCode = async (
+  code: string,
+  type: 'plan' | 'addon',
+  value: string,
+  uses: number,
+  options?: AccessCodeOptions
+) => {
   try {
     const cleanCode = code.toUpperCase().trim();
     // Salva ID e campo 'codigo'
     await setDoc(doc(db, "codigos_acesso", cleanCode), {
       codigo: cleanCode,
       type,
-      plan: value, 
+      plan: value,
       uses,
+      grantChristmas: options?.grantChristmas || false,
       createdAt: serverTimestamp()
     });
     return { success: true };
@@ -240,6 +295,11 @@ export const createAccessCode = async (code: string, type: 'plan' | 'addon', val
     console.error("Erro ao criar código:", error);
     throw error;
   }
+};
+
+// Helper específico para o lançamento: cria um código que libera o plano Premium e o Protocolo de Natal
+export const createPremiumLaunchCode = async (code: string, uses = 1) => {
+  return createAccessCode(code, 'plan', 'general', uses, { grantChristmas: true });
 };
 
 // --- DATABASE LISTENERS & UPDATES ---
@@ -306,10 +366,13 @@ export const redeemCode = async (uid: string, codeInput: string) => {
 
     const userRef = doc(db, "users", uid);
 
-    // Aplica benefício
-    if (data.type === 'plan') {
+    // Aplica benefício: se tiver plan, atualiza o plano
+    if (data.plan) {
       await setDoc(userRef, { tipo_plano: data.plan }, { merge: true });
-    } else {
+    }
+
+    // Se o código tiver o flag grantChristmas, libera o addon de Natal
+    if (data.grantChristmas === true || data.type === 'addon' || data.value === 'christmas') {
       await setDoc(userRef, { hasChristmasAddon: true }, { merge: true });
     }
 

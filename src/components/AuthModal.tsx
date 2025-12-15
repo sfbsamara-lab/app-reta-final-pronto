@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, ArrowRight, Loader2, AlertCircle, KeyRound, HelpCircle } from 'lucide-react';
+import { X, Lock, Mail, ArrowRight, Loader2, AlertCircle, HelpCircle } from 'lucide-react';
 import { Button } from './Button';
-import { loginUser, registerWithCodeAndUserPass, resetPassword } from '../firebase'; 
+import { loginUser, registerSimple, resetPassword } from '../firebase'; 
 
 interface AuthModalProps {
   onClose: () => void;
@@ -12,7 +12,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
   const [activeTab, setActiveTab] = useState<'login' | 'register' | 'reset'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [accessCode, setAccessCode] = useState('');
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +29,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
     try {
       const cleanEmail = email.trim();
       const cleanPass = password.trim();
-      const cleanCode = accessCode.trim().toUpperCase();
 
       if (activeTab === 'login') {
         if (!cleanEmail || !cleanPass) throw new Error("Preencha todos os campos.");
@@ -42,9 +40,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
 
       } else if (activeTab === 'register') {
         if (cleanPass.length < 6) throw new Error("A senha deve ter no mínimo 6 caracteres.");
-        if (!cleanCode) throw new Error("O código de acesso é obrigatório.");
 
-        const result = await registerWithCodeAndUserPass(cleanEmail, cleanPass, cleanCode);
+        const result = await registerSimple(cleanEmail, cleanPass);
         if (result.error) throw new Error(result.error);
         
         onSuccess();
@@ -98,12 +95,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
           <div className="text-center mb-6">
             <h2 className="text-xl font-black text-white uppercase italic">
               {activeTab === 'login' && "Acessar Base"}
-              {activeTab === 'register' && "Ativar Código"}
+              {activeTab === 'register' && "Criar Conta"}
               {activeTab === 'reset' && "Recuperar Senha"}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
               {activeTab === 'login' && "Bem-vindo de volta."}
-              {activeTab === 'register' && "Insira o código VIP recebido."}
+              {activeTab === 'register' && "Crie sua conta com e-mail e senha. Após o pagamento via PIX seu plano será atualizado."}
               {activeTab === 'reset' && "Enviaremos um link para seu e-mail."}
             </p>
           </div>
@@ -149,24 +146,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
               </div>
             )}
 
-            {activeTab === 'register' && (
-              <div className="space-y-1 animate-in slide-in-from-top-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Código de Acesso</label>
-                </div>
-                <div className="relative">
-                  <KeyRound className="absolute left-3 top-3 w-5 h-5 text-emerald-500" />
-                  <input 
-                    type="text" 
-                    required
-                    value={accessCode}
-                    onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                    className="w-full bg-slate-950 border border-emerald-500/30 rounded-lg py-3 pl-10 pr-4 text-white focus:border-emerald-500 focus:outline-none uppercase tracking-widest font-mono placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-600 transition-colors"
-                    placeholder="Ex: GENERAL-2025"
-                  />
-                </div>
-              </div>
-            )}
 
             {error && (
               <div className="bg-red-950/30 border border-red-500/20 p-3 rounded-lg flex items-center gap-2 text-red-400 text-xs animate-in slide-in-from-top-1">
@@ -186,12 +165,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  {activeTab === 'register' ? "VALIDANDO CÓDIGO..." : "PROCESSANDO..."}
+                  {activeTab === 'register' ? "CRIANDO CONTA..." : "PROCESSANDO..."}
                 </>
               ) : (
                 <>
                   {activeTab === 'login' && "ENTRAR"}
-                  {activeTab === 'register' && "VALIDAR E CRIAR"}
+                  {activeTab === 'register' && "CRIAR CONTA"}
                   {activeTab === 'reset' && "ENVIAR LINK"}
                   {activeTab !== 'reset' && <ArrowRight className="w-4 h-4 ml-2" />}
                 </>

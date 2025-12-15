@@ -408,6 +408,8 @@ export default function App() {
           </div>
 
           <div className="relative z-10 w-full max-w-md space-y-4 pb-6">
+            {/* Admin panel: só aparece com ?admin=true na URL (para gerar códigos de lançamento) */}
+
             <button onClick={() => handlePurchase('general')} className="relative w-full bg-slate-900 rounded-xl p-4 flex items-center justify-between border border-yellow-500/50 hover:bg-slate-800 transition-all active:scale-[0.98] group">
               <div className="absolute inset-0 bg-yellow-500/5 group-hover:bg-yellow-500/10 transition-colors rounded-xl"></div>
               <div className="text-left relative z-10">

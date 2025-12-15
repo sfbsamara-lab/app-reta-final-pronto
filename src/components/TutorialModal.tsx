@@ -87,7 +87,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
         </div>
 
         <div className="flex-shrink-0 mt-4">
-          <Button fullWidth onClick={handleClose}>
+          <Button fullWidth onClick={handleClose} disabled={isClosing}>
             ENTENDIDO, INICIAR MISSÃO
           </Button>
         </div>
