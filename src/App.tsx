@@ -23,8 +23,9 @@ import { Notification } from './components/Notification';
 import { ContentLibraryModal } from './components/ContentLibraryModal';
 import { SetGoalsModal } from './components/SetGoalsModal';
 import { SetFastingGoalModal } from './components/SetFastingGoalModal';
-import { auth, subscribeToUserData, logoutUser, completeTutorial, saveDailyProgress, getAllDailyProgress, updateUserWaterGoal, updateUserFastingGoal } from './firebase';
+import { auth, db, subscribeToUserData, logoutUser, completeTutorial, saveDailyProgress, getAllDailyProgress, updateUserWaterGoal, updateUserFastingGoal } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 // --- DADOS ESTÁTICOS ---
 
@@ -276,6 +277,90 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [user, tasks.water, waterGoal]);
+
+  // --- LEMBRETES IN-APP (água, treino, manter a chama) ---
+  // Horários em HH:MM (24h)
+  const REMINDER_SCHEDULE: Record<string, string[]> = {
+    water: ['10:00', '14:00', '18:00'],
+    workout: ['07:00'],
+    flame: ['20:30']
+  };
+
+  const todayKey = () => {
+    const d = new Date();
+    return d.toISOString().split('T')[0]; // YYYY-MM-DD
+  };
+
+  const getSentRemindersForToday = (): Record<string, boolean> => {
+    try {
+      const raw = localStorage.getItem(`sentReminders_${todayKey()}`);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  };
+
+  const markReminderSent = async (type: string) => {
+    const today = todayKey();
+    const key = `sentReminders_${today}`;
+    const current = getSentRemindersForToday();
+    current[type] = true;
+    localStorage.setItem(key, JSON.stringify(current));
+
+    // Se o usuário estiver logado, grava no Firestore para consistência entre aparelhos
+    try {
+      if (user && user.uid) {
+        const userRef = doc(db, 'users', user.uid);
+        await setDoc(userRef, { lastReminders: { [type]: today } }, { merge: true });
+      }
+    } catch (e) {
+      console.warn('[Reminders] Falha ao gravar lastReminders no Firestore:', e);
+    }
+  };
+
+  const sendReminder = async (type: 'water' | 'workout' | 'flame') => {
+    if (type === 'water') {
+      setNotification({ message: 'Lembre-se de beber água para alcançar sua meta de hoje.', type: 'info' });
+    } else if (type === 'workout') {
+      setNotification({ message: 'Hora do treino! Vamos mover o corpo por 15 minutos.', type: 'info' });
+    } else if (type === 'flame') {
+      setNotification({ message: 'Mantenha a chama: complete seus hábitos de hoje e não perca seu streak 🔥', type: 'success' });
+    }
+    await markReminderSent(type);
+  };
+
+  useEffect(() => {
+    let interval: any = null;
+
+    const checkReminders = async () => {
+      const now = new Date();
+      const hhmm = now.toTimeString().slice(0,5); // HH:MM
+      const sent = getSentRemindersForToday();
+
+      // Água: notifica se abaixo da meta
+      if (REMINDER_SCHEDULE.water.includes(hhmm) && !sent.water) {
+        if (tasks.water < (user?.waterGoal || 3000)) await sendReminder('water');
+      }
+
+      // Treino: notifica se ainda não realizou treino hoje
+      if (REMINDER_SCHEDULE.workout.includes(hhmm) && !sent.workout) {
+        if (!tasks.workout) await sendReminder('workout');
+      }
+
+      // Mantenha a chama: notifica ao final do dia se nem todos hábitos foram completados
+      if (REMINDER_SCHEDULE.flame.includes(hhmm) && !sent.flame) {
+        const completedAll = tasks.water >= (user?.waterGoal || 3000) && tasks.workout && tasks.fasting;
+        if (!completedAll) await sendReminder('flame');
+      }
+    };
+
+    // Checa a cada minuto
+    interval = setInterval(checkReminders, 60 * 1000);
+    // Primeira checagem imediata (no mount)
+    checkReminders();
+
+    return () => clearInterval(interval);
+  }, [user, tasks]);
 
   // --- LÓGICA DE NEGÓCIO ---
 
