@@ -21,6 +21,7 @@ import { PixModal } from './components/PixModal';
 import { RewardsModal } from './components/RewardsModal';
 import { Notification } from './components/Notification';
 import NotificationsSettingsModal from './components/NotificationsSettingsModal';
+import ProgressHistoryModal from './components/ProgressHistoryModal';
 import { Settings } from 'lucide-react';
 import { ContentLibraryModal } from './components/ContentLibraryModal';
 import { SetGoalsModal } from './components/SetGoalsModal';
@@ -177,6 +178,7 @@ export default function App() {
   const [dailyProgressHistory, setDailyProgressHistory] = useState<DailyProgress[]>([]);
   const [notification, setNotification] = useState<{ message: string; type?: 'success' | 'error' | 'info' | 'warning' } | null>(null);
   const [showNotificationsSettings, setShowNotificationsSettings] = useState(false);
+  const [showProgressHistoryModal, setShowProgressHistoryModal] = useState(false);
   const [showContentLibraryModal, setShowContentLibraryModal] = useState(false);
   const [showSetGoalsModal, setShowSetGoalsModal] = useState(false);
   const [showSetFastingGoalsModal, setShowSetFastingGoalsModal] = useState(false);
@@ -622,7 +624,7 @@ export default function App() {
               </div>
             )}
             {showNotificationsSettings && <NotificationsSettingsModal onClose={() => setShowNotificationsSettings(false)} />}
-
+              {showProgressHistoryModal && <ProgressHistoryModal history={dailyProgressHistory} waterGoal={user?.waterGoal} onClose={() => setShowProgressHistoryModal(false)} />}
             <div className="animate-in fade-in slide-in-from-top-4 duration-700 relative">
                <button onClick={user.hasChristmasAddon ? () => setShowChristmasModal(true) : startChristmasFlow} className={`w-full bg-gradient-to-r from-red-900 to-slate-900 border ${!user.hasChristmasAddon ? 'border-yellow-500/50' : 'border-red-500/30'} p-4 rounded-xl flex items-center justify-between shadow-lg shadow-red-900/20 group hover:border-red-500/50 transition-all relative overflow-hidden`}>
                   <div className="flex items-center gap-3">
@@ -639,30 +641,25 @@ export default function App() {
               <div className="flex items-center gap-2 mt-2"><Timer className="w-4 h-4 text-slate-500" /><p className="text-[10px] text-slate-500">Reseta à meia-noite</p></div>
             </Card>
 
-            {/* Histórico de Progresso Diário */}
+            {/* Histórico de Progresso Diário (resumido) */}
             <div className="space-y-4 pt-4 border-t border-slate-800/50">
-              <h3 className="text-yellow-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                <CalendarDays className="w-4 h-4 text-yellow-500" /> Histórico de Progresso
-              </h3>
-              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-                {dailyProgressHistory.length === 0 ? (
-                  <p className="p-4 text-sm text-slate-500 text-center">Nenhum registro de progresso ainda.</p>
-                ) : (
-                  <div className="divide-y divide-slate-800">
-                    {dailyProgressHistory
-                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                      .map((day, idx) => (
-                        <div key={idx} className="p-4 flex items-center justify-between">
-                          <span className="text-sm font-bold text-slate-200">{new Date(day.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
-                          <div className="flex items-center gap-3">
-                            <span className={`text-xs ${day.water > 0 ? 'text-blue-400' : 'text-slate-600'}`}>💧 {day.water / 1000}L</span>
-                            <span className={`text-xs ${day.fasting ? 'text-emerald-400' : 'text-slate-600'}`}>🍴 Jejum</span>
-                            <span className={`text-xs ${day.workout ? 'text-orange-400' : 'text-slate-600'}`}>🔥 Treino</span>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                )}
+              <div className="flex items-center justify-between">
+                <h3 className="text-yellow-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                  <CalendarDays className="w-4 h-4 text-yellow-500" /> Histórico de Progresso
+                </h3>
+                <button onClick={() => setShowProgressHistoryModal(true)} className="bg-yellow-500 text-black font-bold px-3 py-2 rounded-lg shadow">Ver histórico</button>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden p-4">
+                <p className="text-sm text-slate-300">Resumo recente</p>
+                <div className="mt-3 flex items-center gap-3">
+                  {dailyProgressHistory.slice(0,4).map((d, i) => (
+                    <div key={i} className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded">
+                      <div className="font-bold">{new Date(d.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</div>
+                      <div className="text-[11px]">💧 {Math.round(d.water/1000)}L • {d.workout ? '🔥' : '—'}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
