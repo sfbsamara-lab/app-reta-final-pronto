@@ -5,7 +5,9 @@ import {
   createUserWithEmailAndPassword, 
   signOut, 
   sendPasswordResetEmail,
-  updatePassword
+  updatePassword,
+  setPersistence,
+  browserLocalPersistence
 } from "firebase/auth";
 import { 
   getFirestore, 
@@ -36,6 +38,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Ensure Firebase auth persists locally (PWA / installed app should stay logged in until explicit sign-out)
+setPersistence(auth, browserLocalPersistence).catch((e) => {
+  console.warn('[AUTH] setPersistence failed:', e);
+});
 
 // --- TIPOS ---
 interface UserData {
