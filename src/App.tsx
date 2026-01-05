@@ -31,6 +31,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
 // --- DADOS ESTÁTICOS ---
+// Observação: campos opcionais `allergens?: string[]` e `substitutions?: string[]`
+// podem ser adicionados a receitas para indicar alergênicos e opções veganas/substituições.
 
 const DETOX_TEAS = [
   { name: "Hibisco com Gengibre", desc: "Ação diurética e anti-inflamatória; ideal para reduzir retenção.", recipe: "Ingredientes: 1 colher de sopa de hibisco seco, 2 rodelas de gengibre, 500ml água. Preparo: ferva 500ml, desligue, adicione hibisco e gengibre, abafe 8–10min. Tomar 1 xícara após as refeições para reduzir inchaço." },
@@ -50,49 +52,63 @@ const SOS_RECIPES = [
     ingredients: ["2 ovos", "50g espinafre", "30g queijo cottage", "Sal e pimenta a gosto"],
     prep: "Bata os ovos, misture com espinafre e queijo. Cozinhe em frigideira antiaderente.",
     benefits: "Rico em proteínas, sustenta e ajuda na recuperação muscular.",
-    tags: ["Recovery"]
+    tags: ["Recovery"],
+    allergens: ["ovos", "laticínios"],
+    substitutions: ["Substituir ovos: 2 colheres de sopa de farinha de grão-de-bico + água (ovo vegano) ou 150g tofu amassado", "Substituir queijo cottage: 30g tofu amassado/queijo vegano"]
   },
   {
     name: "Salada de Quinoa e Legumes",
     ingredients: ["100g quinoa cozida", "Tomate cereja", "Pepino", "Cebola roxa", "Azeite, limão, sal"],
     prep: "Misture todos os ingredientes. Tempere com azeite, limão e sal.",
     benefits: "Fonte de fibras e proteínas vegetais, ideal para saciedade e digestão.",
-    tags: []
+    tags: [],
+    allergens: [],
+    substitutions: []
   },
   {
     name: "Peito de Frango Grelhado com Purê de Batata Doce",
     ingredients: ["150g peito de frango", "200g batata doce", "Azeite", "Sal e pimenta"],
     prep: "Tempere o frango com sal e pimenta e grelhe. Cozinhe a batata doce, amasse com um fio de azeite e sirva junto.",
     benefits: "Proteína magra e carboidrato de baixo índice glicêmico para recuperação e saciedade.",
-    tags: []
+    tags: [],
+    allergens: ["frango"],
+    substitutions: ["Substituir frango por 150g tofu grelhado ou 150g grão-de-bico assado para versão vegana"]
   },
   {
     name: "Salada Morna de Quinoa com Grão-de-Bico",
     ingredients: ["100g quinoa", "80g grão-de-bico cozido", "Tomate", "Pepino", "Ervas frescas"],
     prep: "Cozinhe a quinoa, misture com grão-de-bico e vegetais. Tempere com azeite e limão.",
     benefits: "Fibras, proteína vegetal e gorduras saudáveis para saciedade e digestão.",
-    tags: []
+    tags: [],
+    allergens: [],
+    substitutions: []
   },
   {
     name: "Bowl de Salmão e Legumes Assados",
     ingredients: ["120g salmão", "Legumes variados (abobrinha, pimentão)", "Quinoa ou arroz integral"],
     prep: "Asse os legumes e o salmão; monte o bowl com a base de grãos.",
     benefits: "Rico em ômega-3, ótimo para recuperação e controle inflamatório.",
-    tags: []
+    tags: [],
+    allergens: ["peixe"],
+    substitutions: ["Substituir salmão por 120g tofu marinado ou 120g grão-de-bico assado para versão sem peixe"]
   },
   {
     name: "Mousse de Chocolate Fit",
     ingredients: ["1 abacate maduro", "2 colheres de cacau em pó", "Mel ou adoçante a gosto", "Essência de baunilha"],
     prep: "Bata todos os ingredientes até obter textura cremosa. Leve à geladeira 30 minutos antes de servir.",
     benefits: "Sobremesa com gorduras saudáveis e sem açúcar refinado.",
-    tags: ["Dessert"]
+    tags: ["Dessert"],
+    allergens: [],
+    substitutions: ["Caso seja vegano: substituir mel por xarope de agave ou maple syrup"]
   },
   {
     name: "Pudim de Chia e Coco",
     ingredients: ["3 colheres de chia", "200ml leite de coco", "Frutas vermelhas para cobertura"],
     prep: "Misture a chia com o leite de coco e deixe gelar por 2-4 horas. Sirva com frutas por cima.",
     benefits: "Fonte de fibras e gorduras boas; ótimo para saciedade.",
-    tags: ["Dessert"]
+    tags: ["Dessert"],
+    allergens: [],
+    substitutions: []
   },
 ];
 

@@ -29,3 +29,32 @@ export interface DailyProgress {
   workout: boolean;
   timestamp: any; // serverTimestamp
 }
+
+// Tipos para biblioteca de conteúdo / receitas
+export interface TeaItem {
+  name: string;
+  desc: string;
+  recipe: string;
+  allergens?: string[];
+  substitutions?: string[];
+}
+
+export interface RecipeItem {
+  name: string;
+  ingredients: string[];
+  prep: string;
+  benefits?: string;
+  tags?: string[];
+  allergens?: string[];
+  substitutions?: string[];
+}
+
+export interface LunchItem {
+  name: string;
+  calories: string;
+  time: string;
+  ingredients: string[];
+  prep: string;
+  allergens?: string[];
+  substitutions?: string[];
+}

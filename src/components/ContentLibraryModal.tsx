@@ -1,10 +1,11 @@
 import React from 'react';
 import { X, CupSoda, Utensils, HeartPulse } from 'lucide-react';
+import { TeaItem, RecipeItem } from '../types';
 
 interface ContentLibraryModalProps {
   onClose: () => void;
-  detoxTeas: { name: string; desc: string; recipe: string }[];
-  sosRecipes: { name: string; ingredients: string[]; prep: string; benefits: string; tags?: string[] }[];
+  detoxTeas: TeaItem[];
+  sosRecipes: RecipeItem[];
   sosCardio: { title: string; duration: string; intensity: string; tags?: string[]; desc: string; steps: string[]; youtubeLink?: string }[];
 }
 
@@ -103,7 +104,22 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
                   <h4 className="font-bold text-white text-lg mb-1">{recipe.name}</h4>
                   <p className="text-xs text-emerald-400 italic mb-2">Benefícios: {recipe.benefits}</p>
                   <p className="text-sm text-slate-300 mb-2">Ingredientes: {recipe.ingredients.join(', ')}</p>
-                  <p className="text-sm text-slate-300">Preparo: {recipe.prep}</p>
+                  <p className="text-sm text-slate-300 mb-2">Preparo: {recipe.prep}</p>
+
+                  {recipe.allergens && recipe.allergens.length > 0 && (
+                    <p className="text-sm text-amber-300 font-bold mt-2">Atenção: contém {recipe.allergens.join(', ')}.</p>
+                  )}
+
+                  {recipe.substitutions && recipe.substitutions.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-[12px] text-slate-400 font-bold mb-1">Sugestões de substituição:</p>
+                      <ul className="list-disc list-inside text-sm text-slate-300">
+                        {recipe.substitutions.map((s, sIdx) => (
+                          <li key={sIdx}>{s}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

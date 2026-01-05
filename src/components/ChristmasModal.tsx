@@ -134,6 +134,7 @@ export const ChristmasModal: React.FC<ChristmasModalProps> = ({ onClose }) => {
                 <h4 className="text-white font-bold">Caldo Leve e Rápido</h4>
                 <p className="text-xs text-emerald-400 italic">Benefícios: reidratação com sódio e reposição de aminoácidos.</p>
                 <p className="text-sm text-slate-300 mb-1"><strong>Ingredientes:</strong> 400ml caldo de frango caseiro (coxa), cenoura, cebola, sal moderado.</p>
+                <p className="text-sm text-amber-300 font-bold mt-2">Atenção: contém frango — para versão vegana, use caldo de legumes caseiro.</p>
                 <p className="text-sm text-slate-300"><strong>Preparo:</strong> Ferva os ingredientes por 20–30min; coe e consuma morno em pequenas colheradas para repor eletrólitos sem cansar o estômago.</p>
               </div>
             </div>

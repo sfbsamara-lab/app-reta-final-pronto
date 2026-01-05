@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { X, ChefHat, Leaf, Flame, ArrowRight, Utensils, Info } from 'lucide-react';
 import { Button } from './Button';
+import { LunchItem, TeaItem } from '../types';
 
 // Interface para o Chá (deve bater com o que definimos no App.tsx)
 interface Tea {
@@ -21,34 +22,42 @@ const METABOLIC_LUNCHES = [
     calories: "350 kcal",
     time: "15 min",
     ingredients: ["3 ovos inteiros", "Espinafre a gosto", "1 colher de cottage", "Tomate cereja"],
-    prep: "Bata os ovos com cottage. Misture os vegetais. Asse por 15min ou faça na frigideira untada com azeite."
+    prep: "Bata os ovos com cottage. Misture os vegetais. Asse por 15min ou faça na frigideira untada com azeite.",
+    allergens: ["ovos", "laticínios"],
+    substitutions: ["Substituir ovos: 2 colheres de sopa de farinha de grão-de-bico + água (ovo vegano) ou tofu mexido", "Substituir cottage: tofu amassado ou queijo vegano"]
   },
   {
     name: "Frango Grelhado com Purê de Abóbora",
     calories: "400 kcal",
     time: "20 min",
     ingredients: ["150g peito de frango", "Limão e páprica", "200g abóbora cabotiá cozida", "Canela em pó"],
-    prep: "Tempere o frango e grelhe. Amasse a abóbora cozida com um garfo e finalize com uma pitada de canela (termogênico)."
+    prep: "Tempere o frango e grelhe. Amasse a abóbora cozida com um garfo e finalize com uma pitada de canela (termogênico).",
+    allergens: ["frango"],
+    substitutions: ["Substituir frango por 150g tofu grelhado ou 150g grão-de-bico assado para versão vegana"]
   },
   {
     name: "Salada de Atum Power",
     calories: "320 kcal",
     time: "5 min",
     ingredients: ["1 lata de atum em água", "Mix de folhas verdes", "Pepino japonês", "1 colher de azeite extra virgem"],
-    prep: "Escorra o atum. Misture tudo em um bowl. O azeite deve ser adicionado apenas na hora de comer."
+    prep: "Escorra o atum. Misture tudo em um bowl. O azeite deve ser adicionado apenas na hora de comer.",
+    allergens: ["peixe"],
+    substitutions: ["Substituir atum por 1/2 xícara de grão-de-bico cozido para versão vegana"]
   },
   {
     name: "Carne Moída com Vagem",
     calories: "380 kcal",
     time: "15 min",
     ingredients: ["150g patinho moído", "1 xícara de vagem picada", "Alho e cebola", "Pimenta do reino"],
-    prep: "Refogue a carne com temperos. Quando estiver quase pronta, adicione a vagem e deixe cozinhar no vapor da carne."
+    prep: "Refogue a carne com temperos. Quando estiver quase pronta, adicione a vagem e deixe cozinhar no vapor da carne.",
+    allergens: ["carne"],
+    substitutions: ["Substituir carne por lentilha cozida ou proteína de soja texturizada para versão vegana"]
   }
 ];
 
 export const RecipeModal: React.FC<RecipeModalProps> = ({ onClose, dailyTea }) => {
   // Seleciona o almoço baseado no dia do mês (para ser consistente com o chá)
-  const todaysLunch = useMemo(() => {
+  const todaysLunch: LunchItem = useMemo(() => {
     const dayIndex = new Date().getDate();
     return METABOLIC_LUNCHES[dayIndex % METABOLIC_LUNCHES.length];
   }, []);
@@ -98,11 +107,21 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ onClose, dailyTea }) =
                     </li>
                   ))}
                 </ul>
-              </div>
-              
-              <div className="pt-3 border-t border-slate-800/50">
-                <p className="text-xs font-bold text-slate-500 uppercase mb-1">Preparo</p>
-                <p className="text-sm text-slate-400 leading-relaxed italic">"{todaysLunch.prep}"</p>
+
+                {Array.isArray((todaysLunch as any).allergens) && (todaysLunch as any).allergens.length > 0 && (
+                  <p className="text-sm text-amber-300 font-bold mt-3">Atenção: contém {(todaysLunch as any).allergens.join(', ')}.</p>
+                )}
+
+                {Array.isArray((todaysLunch as any).substitutions) && (todaysLunch as any).substitutions.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-[12px] text-slate-400 font-bold mb-1">Sugestões de substituição:</p>
+                    <ul className="list-disc list-inside text-sm text-slate-300">
+                      {(todaysLunch as any).substitutions.map((s: string, sIdx: number) => (
+                        <li key={sIdx}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           </div>
