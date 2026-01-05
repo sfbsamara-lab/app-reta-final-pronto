@@ -61,13 +61,38 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
         <div className="flex-1 p-4 space-y-4 overflow-y-auto custom-scrollbar">
           {activeTab === 'teas' && (
             <div className="space-y-4">
-              {detoxTeas.map((tea, idx) => (
-                <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                  <h4 className="font-bold text-white text-lg mb-1">{tea.name}</h4>
-                  <p className="text-xs text-slate-400 italic mb-2">{tea.desc}</p>
-                  <p className="text-sm text-slate-300">Preparo: {tea.recipe}</p>
-                </div>
-              ))}
+              {detoxTeas.map((tea, idx) => {
+                const raw = tea.recipe || '';
+                // Normalize: remove leading redundant 'Preparo:' and any 'Preparo:' that sits right before 'Ingredientes:'
+                const normalized = raw.replace(/^Preparo:\s*/i, '').replace(/Preparo:\s*(?=Ingredientes:)/ig, '').trim();
+
+                const ingredientesMatch = normalized.match(/Ingredientes:\s*([\s\S]*?)(?=(Preparo:|Como tomar:|Tomar:?|$))/i);
+                const preparoMatch = normalized.match(/Preparo:\s*([\s\S]*?)(?=(Como tomar:|Tomar:?|$))/i);
+                const tomarMatch = normalized.match(/(?:Como tomar:|Tomar:?)([\s\S]*)/i);
+
+                return (
+                  <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+                    <h4 className="font-bold text-white text-lg mb-1">{tea.name}</h4>
+                    <p className="text-xs text-slate-400 italic mb-2">{tea.desc}</p>
+
+                    {ingredientesMatch && (
+                      <p className="text-sm text-slate-300 mb-1"><strong>Ingredientes:</strong> {ingredientesMatch[1].trim()}</p>
+                    )}
+
+                    {preparoMatch && (
+                      <p className="text-sm text-slate-300 mb-1"><strong>Preparo:</strong> {preparoMatch[1].trim()}</p>
+                    )}
+
+                    {tomarMatch && (
+                      <p className="text-sm text-slate-300"><strong>Como tomar:</strong> {tomarMatch[1].trim()}</p>
+                    )}
+
+                    {!ingredientesMatch && !preparoMatch && !tomarMatch && (
+                      <p className="text-sm text-slate-300">{normalized}</p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
 
