@@ -623,7 +623,7 @@ export default function App() {
                   </span>
                 </div>
                 <p className="text-white font-black text-xl italic uppercase">Modo General</p>
-                <p className="text-slate-400 text-xs mt-0.5">ACESSO TOTAL COM BÔNUS DO DESAFIO MUSA 2026 + PACOTES EXTRAS PARA ARRASAR NO CARNAVAL</p>
+                <p className="text-slate-400 text-xs mt-0.5">ACESSO TOTAL + BÔNUS DESAFIO MUSA 2026</p>
               </div>
               <div className="text-right relative z-10">
                 <p className="text-slate-500 text-xs line-through font-medium mb-0.5">De R$ 97,90</p>

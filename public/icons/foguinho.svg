@@ -1,7 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="100%" height="100%" rx="72" fill="#FF4D00" />
-  <g transform="translate(0,20)">
-    <path d="M256 96c-24 40-56 64-56 112 0 88 112 120 112 168 0-48 112-80 112-168 0-48-32-72-56-112-24 56-56 88-112 0z" fill="#FFF"/>
-    <path d="M256 160c-16 28-36 44-36 76 0 64 80 88 80 124 0-36 80-56 80-124 0-32-20-48-36-76-16 38-36 58-80 0z" fill="#FFD700" opacity="0.95"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <filter id="f" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="b" />
+      <feMerge><feMergeNode in="b"/></feMerge>
+    </filter>
+  </defs>
+  <rect x="0" y="0" width="120" height="120" rx="24" fill="#0B0B10" fill-opacity="0.75" />
+  <circle cx="60" cy="60" r="42" fill="#0B0B10" fill-opacity="0.35" stroke="#FF5F1F" stroke-width="2" />
+  <g transform="translate(0,6)" fill="none" stroke="#FF8A2B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#f)">
+    <path d="M60 36c0 6-6 10-6 18 0 16 22 22 22 34 0-12 22-18 22-34 0-8-6-12-10-18-4 12-10 18-22 0z" fill="#FF8A2B" stroke="none"/>
+    <path d="M60 44c-6 10-14 16-14 28 0 20 28 28 28 40 0-12 28-16 28-40 0-12-8-18-14-28-6 14-14 22-28 0z" fill="#FF4D00" opacity="0.95" stroke="none"/>
   </g>
 </svg>
