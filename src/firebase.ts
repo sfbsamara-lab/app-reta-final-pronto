@@ -71,6 +71,13 @@ export interface DailyProgress {
 
 export const loginUser = async (email: string, pass: string) => {
   try {
+    // Garantir persistência local antes de logar (ajuda em PWAs/instalados)
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+    } catch (pErr) {
+      console.warn('[AUTH] setPersistence failed at login:', pErr);
+    }
+
     const userCredential = await signInWithEmailAndPassword(auth, email, pass);
     return { user: userCredential.user };
   } catch (error: any) {
@@ -180,6 +187,13 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
        return { error: "Este código já foi totalmente utilizado." };
     }
 
+    // Garantir persistência local antes de criar usuário
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+    } catch (pErr) {
+      console.warn('[AUTH] setPersistence failed at register (code):', pErr);
+    }
+
     // CRIAÇÃO DO USUÁRIO (Firebase Auth)
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const uid = userCredential.user.uid;
@@ -232,6 +246,12 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
 // Registro simples sem código — cria usuário com plano básico
 export const registerSimple = async (email: string, pass: string) => {
   try {
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+    } catch (pErr) {
+      console.warn('[AUTH] setPersistence failed at register (simple):', pErr);
+    }
+
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const uid = userCredential.user.uid;
     const userDocRef = doc(db, "users", uid);

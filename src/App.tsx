@@ -642,7 +642,7 @@ export default function App() {
                 <Flame className="w-12 h-12 text-orange-500" />
               </div>
             </div>
-            <h1 className="text-5xl font-black mb-2 text-white uppercase italic drop-shadow-lg">Reta Final <span className="text-orange-500">2025</span></h1>
+            <h1 className="text-5xl font-black mb-2 text-white uppercase italic drop-shadow-lg">RETA FINAL</h1>
             <p className="text-slate-300 text-lg font-medium">Rotina Reta Final. <span className="text-white font-bold border-b-2 border-orange-500">Resultados Reais com apenas 15 minutos por dia</span></p>
           </div>
 
