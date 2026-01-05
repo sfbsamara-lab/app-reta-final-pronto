@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Shield, Flame, Lock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Shield, Flame, Lock, AlertTriangle, CheckCircle2, UserCircle } from 'lucide-react';
 import { Button } from './Button';
 
 interface TutorialModalProps {
@@ -33,7 +33,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
           </p>
         </div>
 
-        {/* Lista de Instruções */}
+        {/* Lista de Instruções (sem referências festivas) */}
         <div className="space-y-4 mb-8 flex-grow">
           
           <div className="flex items-start gap-4">
@@ -43,8 +43,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <div>
 <h3 className="text-white font-bold text-sm uppercase">O Fogo (Streak)</h3>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Indica sua sequência de dias perfeitos. A cada ciclo completado, você desbloqueia <strong className="text-yellow-400">bônus exclusivos.</strong> Mas cuidado: se pular um dia, <strong className="text-orange-500">o fogo apaga e você volta ao zero.</strong> Não quebre a corrente.
-              </p>
+                Indica sua sequência de dias perfeitos. A cada ciclo completado, você desbloqueia <strong className="text-yellow-400">bônus exclusivos.</strong> Mas cuidado: se pular um dia, <strong className="text-orange-500">o fogo apaga e você volta ao zero.</strong> Não quebre a corrente. <strong>Importante:</strong> o streak só é incrementado quando você realmente interage no app (cliques, toques, teclas ou salvando progresso).</p>
             </div>
           </div>
 
@@ -67,7 +66,19 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <div>
               <h3 className="text-white font-bold text-sm uppercase">Cadeados (Premium)</h3>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Recursos avançados como o Arsenal de elite (Receitas e Áudios) e a <strong className="text-yellow-400">Biblioteca de Conteúdos</strong> estão disponíveis. Além disso, botões <strong className="text-yellow-400">"Ver Execução"</strong> em alguns treinos e no SOS levam a vídeos explicativos. Desbloqueie tudo ativando o <strong className="text-yellow-500">Modo General - Acesso TOTAL - Inclui o Protocolo SOS Pós-Festas [GRÁTIS]</strong>.
+                Recursos avançados como o Arsenal de elite (Receitas e Áudios) e a <strong className="text-yellow-400">Biblioteca de Conteúdos</strong> estão disponíveis. Além disso, botões <strong className="text-yellow-400">"Ver Execução"</strong> em alguns treinos e no SOS levam a vídeos explicativos. Desbloqueie tudo ativando o <strong className="text-yellow-500">Modo General - Acesso TOTAL - Inclui o Protocolo SOS [GRÁTIS]</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <div className="p-2 bg-sky-900/20 rounded border border-sky-500/20 text-sky-500 shrink-0">
+              <UserCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-sm uppercase">Instalação & Sessão</h3>
+              <p className="text-slate-400 text-xs leading-relaxed">
+                Se você instalar o app na tela inicial, abrir pelo ícone levará diretamente à tela de Entrar. Após entrar, você permanecerá **logado até clicar em Sair** (persistência local). Isso torna o uso diário mais simples — mas o streak só será contado quando você interagir.
               </p>
             </div>
           </div>

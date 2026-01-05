@@ -83,7 +83,7 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ streak, onClose }) =
                     <div className="flex justify-between items-center mb-1">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-black uppercase bg-slate-800 text-slate-400 px-2 rounded">{item.days} Dias</span>
-                        <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded ${item.seasonal ? 'bg-pink-600 text-white' : 'bg-emerald-700 text-white'}`}>{item.seasonal ? 'SAZONAL' : 'RECOMPENSA UNIVERSAL'}</span>
+                        <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded ${item.seasonal ? 'bg-pink-600 text-white' : 'bg-emerald-700 text-white'}`}>{item.seasonal ? 'SAZONAL' : 'RECOMPENSA DE ACESSO'}</span>
                       </div>
 
                       <div className="flex items-center gap-2">

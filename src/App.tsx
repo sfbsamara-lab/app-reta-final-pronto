@@ -236,12 +236,7 @@ export default function App() {
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        try {
-          await touchUserActiveDay(firebaseUser.uid);
-        } catch (e) {
-          console.warn('[Auth] touchUserActiveDay falhou:', e);
-        }
-
+        // NÃO marcar o dia ativo automaticamente ao detectar o auth; exigimos interação do usuário
         const unsubscribeData = subscribeToUserData(firebaseUser.uid, (data) => {
           const today = new Date().toISOString().split('T')[0];
           let loadedTasks = { water: 0, fasting: false, workout: false };
@@ -294,6 +289,55 @@ export default function App() {
     });
     return () => unsubscribeAuth();
   }, []);
+
+  // Se a rota for /entrar (ex.: PWA start_url), abre o modal de login automaticamente
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const path = window.location.pathname;
+    const search = window.location.search;
+    if (path === '/entrar' || search.includes('entry=install') || search.includes('source=install')) {
+      setAuthInitialTab('login');
+      setShowAuthModal(true);
+    }
+  }, []);
+
+  // Marca o usuário como ativo (touchUserActiveDay) na primeira interação do dia (click/tecla/toque)
+  useEffect(() => {
+    if (!user) return;
+    const today = new Date().toISOString().split('T')[0];
+    const key = `activeMarked_${user.uid}_${today}`;
+    if (localStorage.getItem(key)) return; // já marcado hoje
+
+    const markActive = async () => {
+      try {
+        const res = await touchUserActiveDay(user.uid);
+        if (res?.updated) localStorage.setItem(key, '1');
+      } catch (e) {
+        console.warn('[Activity] touchUserActiveDay falhou:', e);
+      }
+    };
+
+    const handler = () => { markActive(); };
+    window.addEventListener('click', handler);
+    window.addEventListener('keydown', handler);
+    window.addEventListener('touchstart', handler);
+
+    return () => {
+      window.removeEventListener('click', handler);
+      window.removeEventListener('keydown', handler);
+      window.removeEventListener('touchstart', handler);
+    };
+  }, [user]);
+
+  // Persist Tasks: gravar local + salvar progresso diário. Também contabiliza atividade do usuário (touch)
+  useEffect(() => {
+    if (user) {
+      const today = new Date().toISOString().split('T')[0];
+      localStorage.setItem(`tasks_${user.uid}_${today}`, JSON.stringify(tasks));
+      saveDailyProgress(user.uid, tasks.water, tasks.fasting, tasks.workout);
+      touchUserActiveDay(user.uid).catch((e) => console.warn('[Tasks] touchUserActiveDay falhou:', e));
+    }
+  }, [tasks, user]);
 
   // Persist Tasks
   useEffect(() => {
