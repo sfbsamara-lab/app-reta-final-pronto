@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Mask, Wine, Utensils, Droplets, Sparkles } from 'lucide-react';
+import { X, PartyPopper, Wine, Utensils, Droplets, Sparkles } from 'lucide-react';
 import { Button } from './Button';
 
 interface ChristmasModalProps {
@@ -23,7 +23,7 @@ export const ChristmasModal: React.FC<ChristmasModalProps> = ({ onClose }) => {
         <div className="p-6 border-b border-carnival-primary/20 bg-gradient-to-r from-carnival-secondary/50 to-slate-900 rounded-t-2xl flex justify-between items-center shrink-0">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Mask className="w-5 h-5 text-carnival-primary animate-bounce" />
+              <PartyPopper className="w-5 h-5 text-carnival-primary animate-bounce" />
               <span className="text-[10px] font-bold bg-carnival-primary text-white px-2 py-0.5 rounded uppercase tracking-wider">Desafio Musa 2026</span>
             </div>
             <h2 className="text-xl font-black text-white uppercase italic">

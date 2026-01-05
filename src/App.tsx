@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Flame, Droplets, Utensils, AlertTriangle, CheckCircle2, Lock,
-  ChefHat, Zap, ArrowRight, Mask, UserCircle, LogOut, Timer,
+  ChefHat, Zap, ArrowRight, UserCircle, LogOut, Timer,
   PartyPopper, Coffee, CalendarDays, MessageSquareQuote,
   HeartPulse, ShieldAlert, Trophy 
 } from 'lucide-react';
@@ -658,7 +658,7 @@ export default function App() {
             <div className="animate-in fade-in slide-in-from-top-4 duration-700 relative">
                <button onClick={user.hasChristmasAddon ? () => setShowChristmasModal(true) : startChristmasFlow} className={`w-full bg-gradient-to-r from-red-900 to-slate-900 border ${!user.hasChristmasAddon ? 'border-yellow-500/50' : 'border-red-500/30'} p-4 rounded-xl flex items-center justify-between shadow-lg shadow-red-900/20 group hover:border-red-500/50 transition-all relative overflow-hidden`}>
                   <div className="flex items-center gap-3">
-                      <div className="relative"><Mask className="w-6 h-6 text-carnival-primary" />{!user.hasChristmasAddon && (<div className="absolute -top-2 -right-2 bg-yellow-500 rounded-full p-1 border border-black shadow"><Lock className="w-2 h-2 text-black" /></div>)}</div>
+                      <div className="relative"><PartyPopper className="w-6 h-6 text-carnival-primary" />{!user.hasChristmasAddon && (<div className="absolute -top-2 -right-2 bg-yellow-500 rounded-full p-1 border border-black shadow"><Lock className="w-2 h-2 text-black" /></div>)}</div>
                       <div className="text-left"><span className="text-white font-bold uppercase text-sm block">Desafio Musa 2026</span>{!user.hasChristmasAddon ? (<span className="text-[10px] text-yellow-500 font-bold uppercase">Comprar: R$ 14,90</span>) : (<span className="text-[10px] text-green-400 font-bold uppercase">Liberado</span>)}</div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-carnival-primary" />
