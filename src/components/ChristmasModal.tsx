@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Gift, Wine, Utensils, Droplets, Sparkles } from 'lucide-react';
+import { X, Mask, Wine, Utensils, Droplets, Sparkles } from 'lucide-react';
 import { Button } from './Button';
 
 interface ChristmasModalProps {
@@ -19,16 +19,17 @@ export const ChristmasModal: React.FC<ChristmasModalProps> = ({ onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
       <div className="bg-red-950/30 border border-red-500/30 w-full max-w-lg rounded-2xl relative shadow-[0_0_50px_rgba(220,38,38,0.15)] flex flex-col max-h-[90vh]">
         
-        {/* Header Festivo */}
-        <div className="p-6 border-b border-red-500/20 bg-gradient-to-r from-red-900/50 to-slate-900 rounded-t-2xl flex justify-between items-center shrink-0">
+        {/* Header Carnavalesco */}
+        <div className="p-6 border-b border-carnival-primary/20 bg-gradient-to-r from-carnival-secondary/50 to-slate-900 rounded-t-2xl flex justify-between items-center shrink-0">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Gift className="w-5 h-5 text-red-500 animate-bounce" />
-              <span className="text-[10px] font-bold bg-red-500 text-white px-2 py-0.5 rounded uppercase tracking-wider">Protocolo Extra</span>
+              <Mask className="w-5 h-5 text-carnival-primary animate-bounce" />
+              <span className="text-[10px] font-bold bg-carnival-primary text-white px-2 py-0.5 rounded uppercase tracking-wider">Desafio Musa 2026</span>
             </div>
             <h2 className="text-xl font-black text-white uppercase italic">
-              Kit Anti-Inchaço <br/><span className="text-red-400">Natal & Ano Novo</span>
+              Kit Blindagem Carnaval <br/><span className="text-carnival-secondary">Carnaval 2026</span>
             </h2>
+            <p className="text-xs text-slate-300 mt-1">Estratégia de 6 semanas para acelerar o metabolismo e eliminar a retenção antes da folia.</p>
           </div>
           <button onClick={onClose} className="p-2 bg-slate-900/50 rounded-full text-slate-400 hover:text-white border border-slate-700">
             <X className="w-5 h-5" />
@@ -38,17 +39,17 @@ export const ChristmasModal: React.FC<ChristmasModalProps> = ({ onClose }) => {
         {/* Content */}
         <div className="overflow-y-auto p-6 space-y-8 scroll-smooth flex-1 bg-slate-900/80">
           
-          {/* Section 1: A Ceia */}
+          {/* Section 1: Pré-Folia */}
           <div className="space-y-4">
-             <div className="flex items-center gap-2 text-red-400">
+             <div className="flex items-center gap-2 text-carnival-primary">
                 <Utensils className="w-5 h-5" />
-                <h3 className="font-black uppercase tracking-widest text-sm">Estratégia de Guerra: A Ceia</h3>
+                <h3 className="font-black uppercase tracking-widest text-sm">Estratégia de Guerra: Pré-Folia</h3>
              </div>
              
              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                 <div className="flex gap-3">
                    <div className="bg-slate-800 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">1</div>
-                   <p className="text-sm text-slate-300"><strong className="text-white">Proteína Primeiro:</strong> Antes de tocar no arroz, farofa ou rabanada, coma um prato cheio de peru/chester/pernil. A proteína gera saciedade e diminui o pico de insulina dos doces.</p>
+                   <p className="text-sm text-slate-300"><strong className="text-white">Proteína Primeiro:</strong> Prefira proteína magra antes de longos dias de festa (blocos e ensaios): reduz sensívelmente o inchaço e melhora saciedade.</p>
                 </div>
                 <div className="flex gap-3">
                    <div className="bg-slate-800 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">2</div>
@@ -83,7 +84,7 @@ export const ChristmasModal: React.FC<ChristmasModalProps> = ({ onClose }) => {
                      <Wine className="w-4 h-4 text-emerald-500"/> Protocolo Zero Açúcar
                    </h4>
                    <p className="text-xs text-slate-300">
-                     No dia seguinte, corte 100% dos carboidratos refinados (pães, sobras de sobremesa). Coma apenas ovos, folhas e carnes. Isso forçará seu corpo a eliminar a água retida pelo excesso de sódio da ceia.
+                     No dia seguinte (pós-folia), corte 100% dos carboidratos refinados. Consuma ovos, folhas e carnes para facilitar a eliminação da retenção hídrica pós-evento.
                    </p>
                 </div>
              </div>

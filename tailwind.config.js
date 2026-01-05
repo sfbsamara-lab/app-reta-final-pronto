@@ -17,6 +17,11 @@ export default {
           red: '#FF0033',
           yellow: '#FFD700',
           slate: '#0F172A',
+        },
+        carnival: {
+          primary: '#FF4D00',
+          secondary: '#9D00FF',
+          accent: '#FFD700'
         }
       },
       animation: {

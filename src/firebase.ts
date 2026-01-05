@@ -229,7 +229,7 @@ export const registerSimple = async (email: string, pass: string) => {
     const uid = userCredential.user.uid;
     const userDocRef = doc(db, "users", uid);
 
-    // Promoção de lançamento: todos os cadastros entre 15/12/2025 e 22/12/2025 ganham Premium + Protocolo de Natal
+    // Promoção de lançamento: todos os cadastros entre 15/12/2025 e 22/12/2025 ganham Premium + Desafio Musa 2026
     const now = new Date();
     const promoStart = new Date('2025-12-15T00:00:00');
     const promoEnd = new Date('2025-12-22T23:59:59');
@@ -259,7 +259,7 @@ export const registerSimple = async (email: string, pass: string) => {
   }
 };
 
-// Concede o plano premium e o Protocolo de Natal ao usuário (usado após confirmação de pagamento)
+// Concede o plano premium e o Desafio Musa 2026 ao usuário (usado após confirmação de pagamento)
 export const grantPremiumToUser = async (uid: string) => {
   try {
     const userRef = doc(db, 'users', uid);
@@ -303,7 +303,7 @@ export const createAccessCode = async (
   }
 };
 
-// Helper específico para o lançamento: cria um código que libera o plano Premium e o Protocolo de Natal
+// Helper específico para o lançamento: cria um código que libera o plano Premium e o Desafio Musa 2026
 export const createPremiumLaunchCode = async (code: string, uses = 1) => {
   return createAccessCode(code, 'plan', 'general', uses, { grantChristmas: true });
 };
@@ -377,7 +377,7 @@ export const redeemCode = async (uid: string, codeInput: string) => {
       await setDoc(userRef, { tipo_plano: data.plan }, { merge: true });
     }
 
-    // Se o código tiver o flag grantChristmas, libera o addon de Natal
+    // Se o código tiver o flag grantChristmas, libera o addon do Desafio Musa 2026 (Carnaval)
     if (data.grantChristmas === true || data.type === 'addon' || data.value === 'christmas') {
       await setDoc(userRef, { hasChristmasAddon: true }, { merge: true });
     }

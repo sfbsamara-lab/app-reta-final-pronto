@@ -5,7 +5,7 @@ interface ContentLibraryModalProps {
   onClose: () => void;
   detoxTeas: { name: string; desc: string; recipe: string }[];
   sosRecipes: { name: string; ingredients: string[]; prep: string; benefits: string }[];
-  sosCardio: { title: string; duration: string; intensity: string; desc: string; steps: string[]; youtubeLink?: string }[];
+  sosCardio: { title: string; duration: string; intensity: string; tags?: string[]; desc: string; steps: string[]; youtubeLink?: string }[];
 }
 
 export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
@@ -15,6 +15,8 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
   sosCardio,
 }) => {
   const [activeTab, setActiveTab] = useState<'teas' | 'recipes' | 'cardio'>('teas');
+  const [secaAbada, setSecaAbada] = useState(false); // Modo Seca Abadá: filtra por tags HIIT/Cardio/Metabólico
+
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md will-change-transform" style={{ WebkitBackfaceVisibility: 'hidden' }}>
@@ -83,7 +85,11 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
 
           {activeTab === 'cardio' && (
             <div className="space-y-4">
-              {sosCardio.map((cardio, idx) => (
+              <div className="flex items-center gap-2 mb-2">
+                <button onClick={() => setSecaAbada(!secaAbada)} className={`text-xs font-bold px-3 py-2 rounded-lg transition-colors ${secaAbada ? 'bg-carnival-primary text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}>Modo Seca Abadá</button>
+                {secaAbada && <span className="text-[10px] text-slate-400">Filtrando: HIIT • Cardio • Metabólico</span>}
+              </div>
+              {(secaAbada ? sosCardio.filter(c => (c.tags || []).some(t => ['HIIT','Cardio','Metabólico'].includes(t))) : sosCardio).map((cardio, idx) => (
                 <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
                   <h4 className="font-bold text-white text-lg mb-1">{cardio.title}</h4>
                   <div className="flex gap-2 mb-2">

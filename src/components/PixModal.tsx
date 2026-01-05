@@ -46,7 +46,7 @@ export const PixModal: React.FC<PixModalProps> = ({ onClose, itemTitle, price}) 
         const uid = auth.currentUser.uid;
         const res = await grantPremiumToUser(uid);
         if (res.success) {
-          alert('Pagamento confirmado — seu acesso PREMIUM e o Protocolo de Natal foram ativados.');
+          alert('Pagamento confirmado — seu acesso PREMIUM e o Desafio Musa 2026 foram ativados.');
         } else {
           alert('Pagamento confirmado, mas houve um erro ao ativar seu plano. Contate o suporte.');
         }

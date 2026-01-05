@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Flame, Droplets, Utensils, AlertTriangle, CheckCircle2, Lock,
-  ChefHat, Zap, ArrowRight, Gift, UserCircle, LogOut, Timer,
+  ChefHat, Zap, ArrowRight, Mask, UserCircle, LogOut, Timer,
   PartyPopper, Coffee, CalendarDays, MessageSquareQuote,
   HeartPulse, ShieldAlert, Trophy 
 } from 'lucide-react';
@@ -71,6 +71,12 @@ const SOS_RECIPES = [
     ingredients: ["100g quinoa cozida", "Tomate cereja", "Pepino", "Cebola roxa", "Azeite, limão, sal"],
     prep: "Misture todos os ingredientes. Tempere com azeite, limão e sal.",
     benefits: "Fonte de fibras e proteínas vegetais, ideal para saciedade e digestão."
+  },
+  {
+    name: "Menu Ressaca (Pós-Bloco)",
+    ingredients: [],
+    prep: "Sucos detox e chás para recuperar o fígado.",
+    benefits: "Sucos detox e chás para recuperar o fígado."
   }
 ];
 
@@ -79,6 +85,7 @@ const SOS_CARDIO = [
     title: "Caminhada em Jejum (AEJ)",
     duration: "30 a 45 minutos",
     intensity: "Leve/Moderada",
+    tags: ["Cardio"],
     desc: "Mantenha um passo firme onde você consiga falar, mas sinta que falta um pouco de ar.",
     steps: ["Beba 500ml de água antes.", "Não consuma nada calórico.", "Se sentir tontura, pare imediatamente."],
     youtubeLink: "" // Removido o link conforme solicitado
@@ -87,6 +94,7 @@ const SOS_CARDIO = [
     title: "HIIT Queima-Glicogênio",
     duration: "15 minutos",
     intensity: "Altíssima",
+    tags: ["HIIT","Metabólico"],
     desc: "O objetivo é esvaziar os estoques de açúcar do sangue rapidamente.",
     steps: ["3 min aquecimento leve.", "30 segundos correndo no MÁXIMO.", "30 segundos andando bem devagar.", "Repita 15 vezes."],
     youtubeLink: "https://www.youtube.com/watch?v=D8nuuuUQUT0"
@@ -95,6 +103,7 @@ const SOS_CARDIO = [
     title: "Alongamento Dinâmico",
     duration: "10 minutos",
     intensity: "Leve",
+    tags: ["Metabólico"],
     desc: "Melhora a flexibilidade e prepara o corpo para o movimento.",
     steps: ["Comece com rotações de braço.", "Continue com alongamentos de perna e tronco.", "Respire profundamente em cada movimento."],
     youtubeLink: "https://www.youtube.com/watch?v=oa6qBacNZPE"
@@ -103,6 +112,7 @@ const SOS_CARDIO = [
     title: "Yoga para Iniciantes",
     duration: "20 minutos",
     intensity: "Leve/Moderada",
+    tags: [],
     desc: "Fortalece o corpo e acalma a mente.",
     steps: ["Comece com posturas básicas como Tadasana.", "Prossiga para Vrikshasana (Postura da Árvore) e Adho Mukha Svanasana (Cachorro Olhando Para Baixo).", "Finalize com Savasana (Postura do Cadáver) para relaxamento."],
     youtubeLink: "https://www.youtube.com/watch?v=v7AYKMP6rOE" // Yoga para iniciantes (alternativo)
@@ -114,8 +124,8 @@ const CountdownTimer = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
 
   useEffect(() => {
-    // Contador da Promoção de Lançamento — termina em 21/12 (72 horas)
-    const targetDate = new Date('2025-12-21T23:59:59');
+    // Contador Carnaval 2026 — alvo: 13/02/2026 18:00
+    const targetDate = new Date('2026-02-13T18:00:00');
     const interval = setInterval(() => {
       const now = new Date();
       const diff = targetDate.getTime() - now.getTime();
@@ -135,14 +145,17 @@ const CountdownTimer = () => {
   }, []);
 
   return (
-    <div className="bg-slate-900/60 backdrop-blur border border-slate-700/50 rounded-lg p-4 flex justify-between items-center text-slate-200 font-mono">
-      <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.days}</span><span className="text-[10px] uppercase">Dias</span></div>
-      <span className="pb-4">:</span>
-      <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.hours}</span><span className="text-[10px] uppercase">Hr</span></div>
-      <span className="pb-4">:</span>
-      <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.mins}</span><span className="text-[10px] uppercase">Min</span></div>
-      <span className="pb-4">:</span>
-      <div className="text-center"><span className="block text-2xl font-bold text-orange-500">{timeLeft.secs}</span><span className="text-[10px] uppercase">Seg</span></div>
+    <div>
+      <div className="mb-2 text-sm font-bold text-slate-300">Faltam <span className="text-white">{timeLeft.days}</span> dias para o Carnaval. <span className="text-yellow-400">O ano começou, e o seu shape?</span></div>
+      <div className="bg-slate-900/60 backdrop-blur border border-slate-700/50 rounded-lg p-4 flex justify-between items-center text-slate-200 font-mono">
+        <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.days}</span><span className="text-[10px] uppercase">Dias</span></div>
+        <span className="pb-4">:</span>
+        <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.hours}</span><span className="text-[10px] uppercase">Hr</span></div>
+        <span className="pb-4">:</span>
+        <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.mins}</span><span className="text-[10px] uppercase">Min</span></div>
+        <span className="pb-4">:</span>
+        <div className="text-center"><span className="block text-2xl font-bold text-carnival-primary">{timeLeft.secs}</span><span className="text-[10px] uppercase">Seg</span></div>
+      </div>
     </div>
   );
 };
@@ -303,6 +316,20 @@ export default function App() {
     flame: ['20:30']
   };
 
+  // Mensagens motivacionais atualizadas para Carnaval
+  const getDaysUntilCarnaval = () => {
+    const target = new Date('2026-02-13T18:00:00');
+    const now = new Date();
+    const diffDays = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+  };
+
+  const MOTIVATIONAL_MESSAGES = [
+    "O Carnaval é mês que vem. Vai treinar ou vai assistir do sofá?",
+    "Beba água. O álcool do bloco desidrata, o treino constrói.",
+    // mensagem dinâmica abaixo
+  ];
+
   const todayKey = () => {
     const d = new Date();
     return d.toISOString().split('T')[0]; // YYYY-MM-DD
@@ -360,9 +387,12 @@ export default function App() {
     if (type === 'water') {
       setNotification({ message: 'Lembre-se de beber água para alcançar sua meta de hoje.', type: 'info' });
     } else if (type === 'workout') {
-      setNotification({ message: 'Hora do treino! Vamos mover o corpo por 15 minutos.', type: 'info' });
+      // usa mensagens motivacionais (aleatórias das principais)
+      const idx = Math.floor(Math.random() * (MOTIVATIONAL_MESSAGES.length - 1));
+      setNotification({ message: MOTIVATIONAL_MESSAGES[idx], type: 'info' });
     } else if (type === 'flame') {
-      setNotification({ message: 'Mantenha a chama: complete seus hábitos de hoje e não perca seu streak 🔥', type: 'success' });
+      const days = getDaysUntilCarnaval();
+      setNotification({ message: `Faltam ${days} dias. Cada treino conta para o biquíni.`, type: 'success' });
     }
     await markReminderSent(type);
   };
@@ -425,7 +455,7 @@ export default function App() {
   const startChristmasFlow = () => {
     setShowPixModal({
       show: true,
-      title: "Kit Natal Anti-Inchaço",
+      title: "Kit Blindagem Carnaval",
       price: "R$ 14,90"
     });
   };
@@ -534,11 +564,11 @@ export default function App() {
           </div>
 
           <div className="relative z-10 w-full max-w-md my-4">
-             <div className="text-xs text-slate-400 mb-2 font-bold">Promoção de Lançamento — termina em 21/12 (72 horas)</div>
+             <div className="text-xs text-slate-400 mb-2 font-bold">Promoção Carnaval — término em 13/02/2026</div>
              <CountdownTimer />
              <div className="flex justify-between items-end mb-1.5 px-1 mt-4">
                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1"><CalendarDays className="w-3 h-3"/> Alvo: Carnaval '26</span>
-               <span className="text-[10px] uppercase font-black text-orange-500 tracking-wide animate-pulse bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">Promoção ativa até 21/12</span>
+               <span className="text-[10px] uppercase font-black text-carnival-primary tracking-wide animate-pulse bg-carnival-primary/10 px-2 py-0.5 rounded border border-carnival-primary/20">Promoção ativa até 13/02</span>
             </div>
           </div>
 
@@ -628,10 +658,10 @@ export default function App() {
             <div className="animate-in fade-in slide-in-from-top-4 duration-700 relative">
                <button onClick={user.hasChristmasAddon ? () => setShowChristmasModal(true) : startChristmasFlow} className={`w-full bg-gradient-to-r from-red-900 to-slate-900 border ${!user.hasChristmasAddon ? 'border-yellow-500/50' : 'border-red-500/30'} p-4 rounded-xl flex items-center justify-between shadow-lg shadow-red-900/20 group hover:border-red-500/50 transition-all relative overflow-hidden`}>
                   <div className="flex items-center gap-3">
-                      <div className="relative"><Gift className="w-6 h-6 text-red-400" />{!user.hasChristmasAddon && (<div className="absolute -top-2 -right-2 bg-yellow-500 rounded-full p-1 border border-black shadow"><Lock className="w-2 h-2 text-black" /></div>)}</div>
-                      <div className="text-left"><span className="text-white font-bold uppercase text-sm block">Protocolo de Natal</span>{!user.hasChristmasAddon ? (<span className="text-[10px] text-yellow-500 font-bold uppercase">Comprar: R$ 14,90</span>) : (<span className="text-[10px] text-green-400 font-bold uppercase">Liberado</span>)}</div>
+                      <div className="relative"><Mask className="w-6 h-6 text-carnival-primary" />{!user.hasChristmasAddon && (<div className="absolute -top-2 -right-2 bg-yellow-500 rounded-full p-1 border border-black shadow"><Lock className="w-2 h-2 text-black" /></div>)}</div>
+                      <div className="text-left"><span className="text-white font-bold uppercase text-sm block">Desafio Musa 2026</span>{!user.hasChristmasAddon ? (<span className="text-[10px] text-yellow-500 font-bold uppercase">Comprar: R$ 14,90</span>) : (<span className="text-[10px] text-green-400 font-bold uppercase">Liberado</span>)}</div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-red-400" />
+                  <ArrowRight className="w-4 h-4 text-carnival-primary" />
                 </button>
             </div>
 
