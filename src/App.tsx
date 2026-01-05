@@ -680,18 +680,6 @@ export default function App() {
                 </h3>
                 <button onClick={() => setShowProgressHistoryModal(true)} className="bg-yellow-500 text-black font-bold px-3 py-2 rounded-lg shadow">Ver histórico</button>
               </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden p-4">
-                <p className="text-sm text-slate-300">Resumo recente</p>
-                <div className="mt-3 flex items-center gap-3">
-                  {dailyProgressHistory.slice(0,4).map((d, i) => (
-                    <div key={i} className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded">
-                      <div className="font-bold">{new Date(d.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</div>
-                      <div className="text-[11px]">💧 {Math.round(d.water/1000)}L • {d.workout ? '🔥' : '—'}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
             <div className="space-y-3">
