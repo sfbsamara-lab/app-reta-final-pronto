@@ -38,31 +38,13 @@ const DETOX_TEAS = [
   { name: "Chá Verde Turbo", desc: "Termogênico e estimulante leve; ajuda na queima de gordura.", recipe: "Ingredientes: 1 saquinho de chá verde, 1 pau de canela. Preparo: infundir 3–4min em água quente (não ferver). Tomar pela manhã ou antes do treino para energia e foco." },
   { name: "Dente de Leão", desc: "Suporte hepático e depurador; indicado após refeições muito gordurosas.", recipe: "Ingredientes: 1 colher de sopa de dente de leão, 500ml água. Preparo: infundir 10min, coar. Tomar 1 xícara após refeição pesada ou no day after." },
   { name: "Matcha Revitalizante", desc: "Matcha concentrado para energia sem pico de glicemia; ótimo no pré-treino.", recipe: "Ingredientes: 1/2 colher de chá matcha, 200ml água quente (não fervente). Preparo: dissolver o matcha com água quente e bater até espumar. Tomar 30–40min antes do treino." },
-  { name: "Chá de Gengibre e Limão", desc: "Apoia digestão e imunidade; alívio rápido para náuseas leves.", recipe: "Ingredientes: 3–4 rodelas de gengibre, suco de 1 limão, 500ml água. Preparo: ferver o gengibre por 5–7min, adicionar limão e beber morno." }
+  { name: "Chá de Gengibre e Limão", desc: "Apoia digestão e imunidade; alívio rápido para náuseas leves.", recipe: "Ingredientes: 3–4 rodelas de gengibre, suco de 1 limão, 500ml água. Preparo: ferver o gengibre por 5–7min, adicionar limão e beber morno." },
+  { name: "Shot Anti-Inflamatório Turbo", desc: "Reduz inflamação sistêmica e retenção líquida.", recipe: "Ingredientes: 1 limão espremido, 1 colher de café de cúrcuma, 1 pitada de pimenta preta, 50ml de água morna. Preparo: Misture tudo vigorosamente e beba em jejum." },
+  { name: "Chá Seca-Barriga de Hibisco", desc: "Diurético potente; elimina o inchaço do excesso de sódio.", recipe: "Ingredientes: 500ml de água, 2 colheres de sopa de hibisco, 1 pau de canela, gengibre em rodelas. Preparo: Ferva a água com gengibre e canela. Desligue, adicione hibisco e abafe por 10min. Tomar 1 xícara após as refeições." },
+  { name: "Suco Verde Detoxificante", desc: "Limpeza hepática e reposição de minerais essenciais.", recipe: "Ingredientes: 1 folha de couve, 1 maçã verde, 1 pedaço de gengibre, 200ml de água de coco, hortelã a gosto. Preparo: Bata tudo no liquidificador com gelo. Não coe para manter as fibras. Tomar de manhã para melhor efeito." }
 ];
 
 const SOS_RECIPES = [
-  {
-    name: "Shot Anti-Inflamatório Turbo",
-    ingredients: ["1 limão espremido", "1 colher de café de cúrcuma", "1 pitada de pimenta preta", "50ml de água morna"],
-    prep: "Misture tudo vigorosamente e beba em jejum imediato.",
-    benefits: "Reduz inflamação sistêmica e retenção líquida instantânea.",
-    tags: ["Recovery"]
-  },
-  {
-    name: "Chá Seca-Barriga de Hibisco",
-    ingredients: ["500ml de água", "2 colheres de sopa de hibisco", "1 pau de canela", "Gengibre em rodelas"],
-    prep: "Ferva a água com gengibre e canela. Desligue, adicione hibisco e abafe por 10min.",
-    benefits: "Diurético potente, elimina o inchaço do excesso de sódio.",
-    tags: []
-  },
-  {
-    name: "Suco Verde Detoxificante",
-    ingredients: ["1 folha de couve", "1 maçã verde", "1 pedaço de gengibre", "200ml de água de coco", "Hortelã a gosto"],
-    prep: "Bata tudo no liquidificador com gelo. Não coe para manter as fibras.",
-    benefits: "Limpeza hepática e reposição de minerais essenciais.",
-    tags: ["Recovery"]
-  },
   {
     name: "Omelete Proteico",
     ingredients: ["2 ovos", "50g espinafre", "30g queijo cottage", "Sal e pimenta a gosto"],
@@ -77,7 +59,41 @@ const SOS_RECIPES = [
     benefits: "Fonte de fibras e proteínas vegetais, ideal para saciedade e digestão.",
     tags: []
   },
-
+  {
+    name: "Peito de Frango Grelhado com Purê de Batata Doce",
+    ingredients: ["150g peito de frango", "200g batata doce", "Azeite", "Sal e pimenta"],
+    prep: "Tempere o frango com sal e pimenta e grelhe. Cozinhe a batata doce, amasse com um fio de azeite e sirva junto.",
+    benefits: "Proteína magra e carboidrato de baixo índice glicêmico para recuperação e saciedade.",
+    tags: []
+  },
+  {
+    name: "Salada Morna de Quinoa com Grão-de-Bico",
+    ingredients: ["100g quinoa", "80g grão-de-bico cozido", "Tomate", "Pepino", "Ervas frescas"],
+    prep: "Cozinhe a quinoa, misture com grão-de-bico e vegetais. Tempere com azeite e limão.",
+    benefits: "Fibras, proteína vegetal e gorduras saudáveis para saciedade e digestão.",
+    tags: []
+  },
+  {
+    name: "Bowl de Salmão e Legumes Assados",
+    ingredients: ["120g salmão", "Legumes variados (abobrinha, pimentão)", "Quinoa ou arroz integral"],
+    prep: "Asse os legumes e o salmão; monte o bowl com a base de grãos.",
+    benefits: "Rico em ômega-3, ótimo para recuperação e controle inflamatório.",
+    tags: []
+  },
+  {
+    name: "Mousse de Chocolate Fit",
+    ingredients: ["1 abacate maduro", "2 colheres de cacau em pó", "Mel ou adoçante a gosto", "Essência de baunilha"],
+    prep: "Bata todos os ingredientes até obter textura cremosa. Leve à geladeira 30 minutos antes de servir.",
+    benefits: "Sobremesa com gorduras saudáveis e sem açúcar refinado.",
+    tags: ["Dessert"]
+  },
+  {
+    name: "Pudim de Chia e Coco",
+    ingredients: ["3 colheres de chia", "200ml leite de coco", "Frutas vermelhas para cobertura"],
+    prep: "Misture a chia com o leite de coco e deixe gelar por 2-4 horas. Sirva com frutas por cima.",
+    benefits: "Fonte de fibras e gorduras boas; ótimo para saciedade.",
+    tags: ["Dessert"]
+  },
 ];
 
 const SOS_CARDIO = [

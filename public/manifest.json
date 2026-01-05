@@ -1,0 +1,16 @@
+{
+  "name": "Desafio Musa 2026 — Reta Final",
+  "short_name": "Desafio Musa",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FF4D00",
+  "theme_color": "#FF4D00",
+  "icons": [
+    {
+      "src": "/icons/foguinho.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -27,7 +27,7 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
             <X className="w-5 h-5" />
           </button>
           <h2 className="text-2xl font-black text-white uppercase italic">Biblioteca de Conteúdo</h2>
-          <p className="text-xs text-slate-400 mt-1">Explore chás, receitas e treinos.</p>
+          <p className="text-xs text-slate-400 mt-1">Explore chás, sucos, receitas e treinos.</p>
         </div>
 
         {/* Tabs */}
@@ -37,7 +37,7 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
             onClick={() => setActiveTab('teas')}
             className={`flex-1 py-4 text-sm font-bold uppercase transition-colors flex items-center justify-center gap-2 ${activeTab === 'teas' ? 'bg-slate-800 text-white border-b-2 border-yellow-500' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            <CupSoda className="w-4 h-4" /> Chás
+            <CupSoda className="w-4 h-4" /> Chás e Sucos
           </button>
           <button
             type="button"
