@@ -46,37 +46,43 @@ const SOS_RECIPES = [
     name: "Shot Anti-Inflamatório Turbo",
     ingredients: ["1 limão espremido", "1 colher de café de cúrcuma", "1 pitada de pimenta preta", "50ml de água morna"],
     prep: "Misture tudo vigorosamente e beba em jejum imediato.",
-    benefits: "Reduz inflamação sistêmica e retenção líquida instantânea."
+    benefits: "Reduz inflamação sistêmica e retenção líquida instantânea.",
+    tags: ["Recovery"]
   },
   {
     name: "Chá Seca-Barriga de Hibisco",
     ingredients: ["500ml de água", "2 colheres de sopa de hibisco", "1 pau de canela", "Gengibre em rodelas"],
     prep: "Ferva a água com gengibre e canela. Desligue, adicione hibisco e abafe por 10min.",
-    benefits: "Diurético potente, elimina o inchaço do excesso de sódio."
+    benefits: "Diurético potente, elimina o inchaço do excesso de sódio.",
+    tags: []
   },
   {
     name: "Suco Verde Detoxificante",
     ingredients: ["1 folha de couve", "1 maçã verde", "1 pedaço de gengibre", "200ml de água de coco", "Hortelã a gosto"],
     prep: "Bata tudo no liquidificador com gelo. Não coe para manter as fibras.",
-    benefits: "Limpeza hepática e reposição de minerais essenciais."
+    benefits: "Limpeza hepática e reposição de minerais essenciais.",
+    tags: ["Recovery"]
   },
   {
     name: "Omelete Proteico",
     ingredients: ["2 ovos", "50g espinafre", "30g queijo cottage", "Sal e pimenta a gosto"],
     prep: "Bata os ovos, misture com espinafre e queijo. Cozinhe em frigideira antiaderente.",
-    benefits: "Rico em proteínas, sustenta e ajuda na recuperação muscular."
+    benefits: "Rico em proteínas, sustenta e ajuda na recuperação muscular.",
+    tags: ["Recovery"]
   },
   {
     name: "Salada de Quinoa e Legumes",
     ingredients: ["100g quinoa cozida", "Tomate cereja", "Pepino", "Cebola roxa", "Azeite, limão, sal"],
     prep: "Misture todos os ingredientes. Tempere com azeite, limão e sal.",
-    benefits: "Fonte de fibras e proteínas vegetais, ideal para saciedade e digestão."
+    benefits: "Fonte de fibras e proteínas vegetais, ideal para saciedade e digestão.",
+    tags: []
   },
   {
     name: "Menu Ressaca (Pós-Bloco)",
-    ingredients: [],
-    prep: "Sucos detox e chás para recuperar o fígado.",
-    benefits: "Sucos detox e chás para recuperar o fígado."
+    ingredients: ["Água de coco", "Suco de couve com abacaxi", "Caldo leve de galinha", "Banana madura", "Gengibre ralado"],
+    prep: "Ofereça água de coco e sucos ricos em eletrólitos. Caldos leves e frutas facilmente digeríveis ajudam a repor energia. Evite alimentos gordurosos e reidratação com eletrólitos a cada hora.",
+    benefits: "Reposição hídrica e eletrólitos, recuperação gastrointestinal e reposição de glicose de forma suave.",
+    tags: ["Recovery"]
   }
 ];
 
@@ -89,6 +95,15 @@ const SOS_CARDIO = [
     desc: "Mantenha um passo firme onde você consiga falar, mas sinta que falta um pouco de ar.",
     steps: ["Beba 500ml de água antes.", "Não consuma nada calórico.", "Se sentir tontura, pare imediatamente."],
     youtubeLink: "" // Removido o link conforme solicitado
+  },
+  {
+    title: "Treino Pré-Bloco — HIIT 12 minutos",
+    duration: "12 minutos",
+    intensity: "Altíssima",
+    tags: ["HIIT","Metabólico","Pre-Block"],
+    desc: "Playlist rápida para esquentar o corpo antes do bloco: 12 minutos intensos, perfeito antes do abadá.",
+    steps: ["2 min aquecimento leve.", "40 seg máximo / 20 seg recup — 8 rounds.", "1 min desaquecimento e alongamento."],
+    youtubeLink: ""
   },
   {
     title: "HIIT Queima-Glicogênio",
@@ -146,7 +161,7 @@ const CountdownTimer = () => {
 
   return (
     <div>
-      <div className="mb-2 text-sm font-bold text-slate-300">Faltam <span className="text-white">{timeLeft.days}</span> dias para o Carnaval. <span className="text-yellow-400">O ano começou, e o seu shape?</span></div>
+      <div className="mb-2 text-sm font-bold text-slate-300">O ano já começou. Você tem <span className="text-white">{timeLeft.days}</span> dias para o seu melhor shape.</div>
       <div className="bg-slate-900/60 backdrop-blur border border-slate-700/50 rounded-lg p-4 flex justify-between items-center text-slate-200 font-mono">
         <div className="text-center"><span className="block text-2xl font-bold">{timeLeft.days}</span><span className="text-[10px] uppercase">Dias</span></div>
         <span className="pb-4">:</span>
@@ -325,9 +340,9 @@ export default function App() {
   };
 
   const MOTIVATIONAL_MESSAGES = [
-    "O Carnaval é mês que vem. Vai treinar ou vai assistir do sofá?",
-    "Beba água. O álcool do bloco desidrata, o treino constrói.",
-    // mensagem dinâmica abaixo
+    "SARGENTO: 15 minutos — sem desculpas. Execute o treino agora!",
+    "SARGENTO: Treino feito hoje = abadá pronto. Sem chororô, mãos no trabalho.",
+    "SARGENTO: Rápido, intenso e eficiente. Você consegue — agora!",
   ];
 
   const todayKey = () => {
@@ -392,7 +407,7 @@ export default function App() {
       setNotification({ message: MOTIVATIONAL_MESSAGES[idx], type: 'info' });
     } else if (type === 'flame') {
       const days = getDaysUntilCarnaval();
-      setNotification({ message: `Faltam ${days} dias. Cada treino conta para o biquíni.`, type: 'success' });
+      setNotification({ message: `O ano já começou. Você tem ${days} dias para o seu melhor shape — bora treinar!`, type: 'success' });
     }
     await markReminderSent(type);
   };
@@ -564,11 +579,11 @@ export default function App() {
           </div>
 
           <div className="relative z-10 w-full max-w-md my-4">
-             <div className="text-xs text-slate-400 mb-2 font-bold">Promoção Carnaval — término em 13/02/2026</div>
+             <div className="text-xs text-slate-400 mb-2 font-bold">Promoção Carnaval — tempo limitado</div>
              <CountdownTimer />
              <div className="flex justify-between items-end mb-1.5 px-1 mt-4">
                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest flex items-center gap-1"><CalendarDays className="w-3 h-3"/> Alvo: Carnaval '26</span>
-               <span className="text-[10px] uppercase font-black text-carnival-primary tracking-wide animate-pulse bg-carnival-primary/10 px-2 py-0.5 rounded border border-carnival-primary/20">Promoção ativa até 13/02</span>
+               <span className="text-[10px] uppercase font-black text-carnival-primary tracking-wide animate-pulse bg-carnival-primary/10 px-2 py-0.5 rounded border border-carnival-primary/20">Promoção por tempo limitado</span>
             </div>
           </div>
 
@@ -584,7 +599,7 @@ export default function App() {
                   </span>
                 </div>
                 <p className="text-white font-black text-xl italic uppercase">Modo General</p>
-                <p className="text-slate-400 text-xs mt-0.5">Acesso TOTAL - Inclui o Protocolo SOS Pós-Festas [GRÁTIS]</p>
+                <p className="text-slate-400 text-xs mt-0.5">ACESSO TOTAL COM BÔNUS DO DESAFIO MUSA 2026 + PACOTES EXTRAS PARA ARRASAR NO CARNAVAL</p>
               </div>
               <div className="text-right relative z-10">
                 <p className="text-slate-500 text-xs line-through font-medium mb-0.5">De R$ 97,90</p>

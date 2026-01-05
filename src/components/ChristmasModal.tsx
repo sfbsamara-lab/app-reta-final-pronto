@@ -53,8 +53,15 @@ export const ChristmasModal: React.FC<ChristmasModalProps> = ({ onClose }) => {
                 </div>
                 <div className="flex gap-3">
                    <div className="bg-slate-800 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">2</div>
-                   <p className="text-sm text-slate-300"><strong className="text-white">A Regra do Álcool:</strong> Para cada taça de vinho/champanhe, 1 copo de água. O álcool desidrata, e a desidratação faz o corpo reter líquido no dia seguinte (o inchaço).</p>
+                   <p className="text-sm text-slate-300"><strong className="text-white">A Regra do Álcool — Atualizada:</strong> No Carnaval a maioria bebe cerveja e drinks; para cada bebida alcoólica, tome 1 copo de água, alterne goles de água entre drinks e evite misturar destilados para reduzir inchaço e mau estar.</p>
                 </div>
+             </div>
+          </div>
+
+          <div className="mt-3 border-t border-slate-800 pt-4 space-y-3">
+             <div className="flex gap-3">
+               <div className="bg-slate-800 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">3</div>
+               <p className="text-sm text-slate-300"><strong className="text-white">O Ciclo do Álcool Inteligente:</strong> Planeje: pré-hidratação com água mineral e eletrólitos, limite destilados, prefira cervejas leves e drinks com baixa caloria; entre cada dose, 1 copo de água. Ao acordar, reponha eletrólitos e proteína para acelerar a recuperação.</p>
              </div>
           </div>
 

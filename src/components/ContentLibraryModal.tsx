@@ -4,7 +4,7 @@ import { X, CupSoda, Utensils, HeartPulse } from 'lucide-react';
 interface ContentLibraryModalProps {
   onClose: () => void;
   detoxTeas: { name: string; desc: string; recipe: string }[];
-  sosRecipes: { name: string; ingredients: string[]; prep: string; benefits: string }[];
+  sosRecipes: { name: string; ingredients: string[]; prep: string; benefits: string; tags?: string[] }[];
   sosCardio: { title: string; duration: string; intensity: string; tags?: string[]; desc: string; steps: string[]; youtubeLink?: string }[];
 }
 
@@ -14,7 +14,7 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
   sosRecipes,
   sosCardio,
 }) => {
-  const [activeTab, setActiveTab] = useState<'teas' | 'recipes' | 'cardio'>('teas');
+  const [activeTab, setActiveTab] = useState<'teas' | 'recipes' | 'cardio' | 'recovery'>('teas');
   const [secaAbada, setSecaAbada] = useState(false); // Modo Seca Abadá: filtra por tags HIIT/Cardio/Metabólico
 
 
@@ -54,6 +54,14 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
           >
             <HeartPulse className="w-4 h-4" /> Treinos
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('recovery')}
+            className={`flex-1 py-4 text-sm font-bold uppercase transition-colors flex items-center justify-center gap-2 ${activeTab === 'recovery' ? 'bg-slate-800 text-white border-b-2 border-yellow-500' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            <CupSoda className="w-4 h-4" /> Ressaca
+          </button>
         </div>
 
         {/* Conteúdo das Abas */}
@@ -73,6 +81,19 @@ export const ContentLibraryModal: React.FC<ContentLibraryModalProps> = ({
           {activeTab === 'recipes' && (
             <div className="space-y-4">
               {sosRecipes.map((recipe, idx) => (
+                <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+                  <h4 className="font-bold text-white text-lg mb-1">{recipe.name}</h4>
+                  <p className="text-xs text-emerald-400 italic mb-2">Benefícios: {recipe.benefits}</p>
+                  <p className="text-sm text-slate-300 mb-2">Ingredientes: {recipe.ingredients.join(', ')}</p>
+                  <p className="text-sm text-slate-300">Preparo: {recipe.prep}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'recovery' && (
+            <div className="space-y-4">
+              {sosRecipes.filter(r => /ressaca|ressaca/i.test(r.name) || /ressaca/i.test(r.benefits || '') || (r.tags || []).includes('Recovery')).map((recipe, idx) => (
                 <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
                   <h4 className="font-bold text-white text-lg mb-1">{recipe.name}</h4>
                   <p className="text-xs text-emerald-400 italic mb-2">Benefícios: {recipe.benefits}</p>
