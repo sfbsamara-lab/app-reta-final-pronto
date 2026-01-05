@@ -33,12 +33,12 @@ import { doc, setDoc } from 'firebase/firestore';
 // --- DADOS ESTÁTICOS ---
 
 const DETOX_TEAS = [
-  { name: "Hibisco com Gengibre", desc: "Acelerador metabólico.", recipe: "500ml água, hibisco, gengibre." },
-  { name: "Cavalinha com Limão", desc: "Adeus retenção.", recipe: "500ml água, cavalinha, limão." },
-  { name: "Chá Verde Turbo", desc: "Queima gordura.", recipe: "Chá verde + canela." },
-  { name: "Dente de Leão", desc: "Detox hepático.", recipe: "500ml água, dente de leão." },
-  { name: "Matcha Revitalizante", desc: "Energia e foco.", recipe: "200ml água quente, 1 colher chá matcha." },
-  { name: "Chá de Gengibre e Limão", desc: "Imunidade e digestão.", recipe: "500ml água, rodelas de gengibre, suco de 1 limão." }
+  { name: "Hibisco com Gengibre", desc: "Ação diurética e anti-inflamatória; ideal para reduzir retenção.", recipe: "Ingredientes: 1 colher de sopa de hibisco seco, 2 rodelas de gengibre, 500ml água. Preparo: ferva 500ml, desligue, adicione hibisco e gengibre, abafe 8–10min. Tomar 1 xícara após as refeições para reduzir inchaço." },
+  { name: "Cavalinha com Limão", desc: "Diurético suave e remineralizante; auxilia eliminação de excesso de sódio.", recipe: "Ingredientes: 1 colher de sopa de cavalinha, suco de 1/2 limão, 500ml água. Preparo: infundir 10min e coar. Tomar 1 copo pela manhã para melhor efeito diurético." },
+  { name: "Chá Verde Turbo", desc: "Termogênico e estimulante leve; ajuda na queima de gordura.", recipe: "Ingredientes: 1 saquinho de chá verde, 1 pau de canela. Preparo: infundir 3–4min em água quente (não ferver). Tomar pela manhã ou antes do treino para energia e foco." },
+  { name: "Dente de Leão", desc: "Suporte hepático e depurador; indicado após refeições muito gordurosas.", recipe: "Ingredientes: 1 colher de sopa de dente de leão, 500ml água. Preparo: infundir 10min, coar. Tomar 1 xícara após refeição pesada ou no day after." },
+  { name: "Matcha Revitalizante", desc: "Matcha concentrado para energia sem pico de glicemia; ótimo no pré-treino.", recipe: "Ingredientes: 1/2 colher de chá matcha, 200ml água quente (não fervente). Preparo: dissolver o matcha com água quente e bater até espumar. Tomar 30–40min antes do treino." },
+  { name: "Chá de Gengibre e Limão", desc: "Apoia digestão e imunidade; alívio rápido para náuseas leves.", recipe: "Ingredientes: 3–4 rodelas de gengibre, suco de 1 limão, 500ml água. Preparo: ferver o gengibre por 5–7min, adicionar limão e beber morno." }
 ];
 
 const SOS_RECIPES = [
@@ -77,13 +77,7 @@ const SOS_RECIPES = [
     benefits: "Fonte de fibras e proteínas vegetais, ideal para saciedade e digestão.",
     tags: []
   },
-  {
-    name: "Menu Ressaca (Pós-Bloco)",
-    ingredients: ["Água de coco", "Suco de couve com abacaxi", "Caldo leve de galinha", "Banana madura", "Gengibre ralado"],
-    prep: "Ofereça água de coco e sucos ricos em eletrólitos. Caldos leves e frutas facilmente digeríveis ajudam a repor energia. Evite alimentos gordurosos e reidratação com eletrólitos a cada hora.",
-    benefits: "Reposição hídrica e eletrólitos, recuperação gastrointestinal e reposição de glicose de forma suave.",
-    tags: ["Recovery"]
-  }
+
 ];
 
 const SOS_CARDIO = [
@@ -96,15 +90,7 @@ const SOS_CARDIO = [
     steps: ["Beba 500ml de água antes.", "Não consuma nada calórico.", "Se sentir tontura, pare imediatamente."],
     youtubeLink: "" // Removido o link conforme solicitado
   },
-  {
-    title: "Treino Pré-Bloco — HIIT 12 minutos",
-    duration: "12 minutos",
-    intensity: "Altíssima",
-    tags: ["HIIT","Metabólico","Pre-Block"],
-    desc: "Playlist rápida para esquentar o corpo antes do bloco: 12 minutos intensos, perfeito antes do abadá.",
-    steps: ["2 min aquecimento leve.", "40 seg máximo / 20 seg recup — 8 rounds.", "1 min desaquecimento e alongamento."],
-    youtubeLink: ""
-  },
+
   {
     title: "HIIT Queima-Glicogênio",
     duration: "15 minutos",
