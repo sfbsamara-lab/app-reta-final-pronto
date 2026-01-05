@@ -118,7 +118,7 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
   // Normalização agressiva: Maiúsculas e sem espaços nas pontas
   const code = accessCode.toUpperCase().trim(); 
   
-  console.log(`[AUTH] Iniciando registro para ${email} com código: "${code}"`);
+  if (import.meta.env.DEV) console.log(`[AUTH] Iniciando registro para ${email} com código: "${code}"`);
 
   try {
     // ESTRATÉGIA 1: Buscar pelo CAMPO 'codigo' via Query
@@ -131,7 +131,7 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
     try {
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
-        console.log("[AUTH] Código encontrado via Query.");
+        if (import.meta.env.DEV) console.log("[AUTH] Código encontrado via Query.");
         codeDocSnap = querySnapshot.docs[0];
         codeRef = codeDocSnap.ref;
       }
@@ -142,12 +142,12 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
 
     // ESTRATÉGIA 2: Buscar pelo ID do documento (Fallback)
     if (!codeDocSnap) {
-      console.log("[AUTH] Tentando buscar código pelo ID do documento...");
+      if (import.meta.env.DEV) console.log("[AUTH] Tentando buscar código pelo ID do documento...");
       const docRefById = doc(db, "codigos_acesso", code);
       const docSnapById = await getDoc(docRefById);
       
       if (docSnapById.exists()) {
-        console.log("[AUTH] Código encontrado via ID.");
+        if (import.meta.env.DEV) console.log("[AUTH] Código encontrado via ID.");
         codeDocSnap = docSnapById;
         codeRef = docRefById;
       }
@@ -166,7 +166,7 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
          return { error: "Erro ao ler dados do código." };
     }
 
-    console.log("[AUTH] Dados do código:", codeData);
+    if (import.meta.env.DEV) console.log("[AUTH] Dados do código:", codeData);
 
     // Validação de Uso
     if (codeData.uses !== undefined && codeData.uses <= 0) {
@@ -176,7 +176,7 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
     // CRIAÇÃO DO USUÁRIO (Firebase Auth)
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const uid = userCredential.user.uid;
-    console.log("[AUTH] Usuário criado no Auth:", uid);
+    if (import.meta.env.DEV) console.log("[AUTH] Usuário criado no Auth:", uid);
 
     // CRIAÇÃO DO DOCUMENTO DO USUÁRIO
     const userDocRef = doc(db, "users", uid);
@@ -194,16 +194,16 @@ export const registerWithCodeAndUserPass = async (email: string, pass: string, a
     };
 
     await setDoc(userDocRef, newUserData);
-    console.log("[AUTH] Documento do usuário criado.");
+    if (import.meta.env.DEV) console.log("[AUTH] Documento do usuário criado.");
 
     // DECREMENTAR USO DO CÓDIGO
     if (codeData.uses !== undefined) {
       if (codeData.uses <= 1) {
         await deleteDoc(codeRef); // Uso único: deleta
-        console.log("[AUTH] Código de uso único deletado.");
+        if (import.meta.env.DEV) console.log("[AUTH] Código de uso único deletado.");
       } else {
         await setDoc(codeRef, { uses: codeData.uses - 1 }, { merge: true });
-        console.log(`[AUTH] Usos restantes: ${codeData.uses - 1}`);
+        if (import.meta.env.DEV) console.log(`[AUTH] Usos restantes: ${codeData.uses - 1}`);
       }
     } else {
       // Se não tiver campo 'uses', deleta por segurança

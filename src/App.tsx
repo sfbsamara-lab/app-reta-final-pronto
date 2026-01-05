@@ -279,7 +279,7 @@ export default function App() {
         const result = await getAllDailyProgress(user.uid);
         if (result.success && result.data) {
           setDailyProgressHistory(result.data);
-          console.log("Histórico de Progresso Diário: ", result.data);
+          if (import.meta.env.DEV) console.log("Histórico de Progresso Diário: ", result.data);
         }
       };
       fetchHistory();
@@ -330,6 +330,9 @@ export default function App() {
     "SARGENTO: Treino feito hoje = abadá pronto. Sem chororô, mãos no trabalho.",
     "SARGENTO: Rápido, intenso e eficiente. Você consegue — agora!",
   ];
+
+  // Garante índice correto ao escolher mensagem aleatória
+  const randomMotivational = () => MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)];
 
   const todayKey = () => {
     const d = new Date();
@@ -388,9 +391,8 @@ export default function App() {
     if (type === 'water') {
       setNotification({ message: 'Lembre-se de beber água para alcançar sua meta de hoje.', type: 'info' });
     } else if (type === 'workout') {
-      // usa mensagens motivacionais (aleatórias das principais)
-      const idx = Math.floor(Math.random() * (MOTIVATIONAL_MESSAGES.length - 1));
-      setNotification({ message: MOTIVATIONAL_MESSAGES[idx], type: 'info' });
+        // usa mensagens motivacionais (aleatórias das principais)
+      setNotification({ message: randomMotivational(), type: 'info' });
     } else if (type === 'flame') {
       const days = getDaysUntilCarnaval();
       setNotification({ message: `O ano já começou. Você tem ${days} dias para o seu melhor shape — bora treinar!`, type: 'success' });
@@ -434,7 +436,11 @@ export default function App() {
   // --- LÓGICA DE NEGÓCIO ---
 
   const todaysTea = useMemo(() => DETOX_TEAS[new Date().getDate() % DETOX_TEAS.length], []);
-  const todaysSOSRecipe = useMemo(() => SOS_RECIPES[new Date().getDate() % SOS_RECIPES.length], []);
+  const todaysSOSRecipe = useMemo(() => {
+    const candidates = SOS_RECIPES.filter(r => Array.isArray(r.ingredients) && r.ingredients.length > 0 && r.prep && r.prep.trim().length > 0);
+    if (candidates.length === 0) return SOS_RECIPES[0];
+    return candidates[new Date().getDate() % candidates.length];
+  }, []);
   const todaysSOSCardio = useMemo(() => SOS_CARDIO[new Date().getDate() % SOS_CARDIO.length], []);
 
   const handlePurchase = (plan: UserPlan) => {
