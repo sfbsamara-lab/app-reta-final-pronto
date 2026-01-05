@@ -10,18 +10,21 @@ interface RewardsModalProps {
 const REWARDS = [
   {
     days: 7,
+    seasonal: false,
     title: "Protocolo Seca-Pochete",
     desc: "3 Sucos secretos para acelerar o metabolismo.",
     content: "1. O Verde Radioativo: 1 maçã verde + 1 couve + gengibre + 1/2 limão.\n\n2. O Vermelho Termogênico: Melancia + pimenta caiena + linhaça."
   },
   {
     days: 14,
+    seasonal: false,
     title: "Hack Mental Anti-Doce",
     desc: "Técnica de 3 minutos para matar a vontade de açúcar.",
     content: "Quando a fissura bater:\n1. Beba água gelada (choque térmico).\n2. Escove os dentes (menta corta paladar doce).\n3. Espere 10min."
   },
   {
     days: 21,
+    seasonal: false,
     title: "Pizza Sem Culpa",
     desc: "A Regra 80/20 para refeição livre.",
     content: "No dia do lixo:\n1. Treino de perna intenso 2h antes.\n2. Proteína magra durante o dia.\n3. Muita água antes da refeição."
@@ -78,9 +81,15 @@ export const RewardsModal: React.FC<RewardsModalProps> = ({ streak, onClose }) =
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-black uppercase bg-slate-800 text-slate-400 px-2 rounded">{item.days} Dias</span>
-                      {!isUnlocked && <span className="text-[10px] text-orange-500 font-bold uppercase">Faltam {daysLeft}</span>}
-                      {isUnlocked && (isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400"/> : <ChevronDown className="w-4 h-4 text-slate-400"/>)}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase bg-slate-800 text-slate-400 px-2 rounded">{item.days} Dias</span>
+                        <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded ${item.seasonal ? 'bg-pink-600 text-white' : 'bg-emerald-700 text-white'}`}>{item.seasonal ? 'SAZONAL' : 'RECOMPENSA UNIVERSAL'}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {!isUnlocked && <span className="text-[10px] text-orange-500 font-bold uppercase">Faltam {daysLeft}</span>}
+                        {isUnlocked && (isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400"/> : <ChevronDown className="w-4 h-4 text-slate-400"/>)}
+                      </div>
                     </div>
                     <h3 className="font-bold text-sm text-white truncate">{item.title}</h3>
                     <p className="text-xs text-slate-500 truncate">{item.desc}</p>
